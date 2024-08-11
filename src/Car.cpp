@@ -5,7 +5,7 @@
 #include "../include/Car.h"
 
 // https://en.sfml-dev.org/forums/index.php?topic=7068.0
-Car::Car() : speed(1000.0f), direction(0.0f, 0.0f) {
+Car::Car() : speed(3000.0f), direction(0.0f, 0.0f) {
     carShape.setSize(sf::Vector2f(16, 16));
     carShape.setFillColor(sf::Color::Red);
     carShape.setPosition(400, 300);
