@@ -4,10 +4,13 @@
 
 #include "../include/Game.h"
 #include "../include/MenuState.h"
+//#include "../include/FileSystem.h"
 
 int main() {
+
+    // Initialize the game
     Game game;
-    game.pushState(std::make_shared<MenuState>());
     game.run();
+
     return 0;
 }

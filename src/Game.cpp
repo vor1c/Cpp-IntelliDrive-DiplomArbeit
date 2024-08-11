@@ -4,12 +4,20 @@
 
 #include "../include/Game.h"
 
-Game::Game() : window(sf::VideoMode(800, 600), "Car Driving Game") {}
+#include <iostream>
+#include <../include/MenuState.h>
+
+Game::Game() : window(sf::VideoMode(800, 600), "IntelliDrive")
+{
+  pushState(std::make_shared<MenuState>());
+}
 
 void Game::run() {
     while (window.isOpen()) {
+
         auto currentState = getCurrentState();
         if (currentState) {
+            std::cout<<"Game1" << std::endl;
             currentState->handleInput(*this);
             currentState->update(*this);
             window.clear();

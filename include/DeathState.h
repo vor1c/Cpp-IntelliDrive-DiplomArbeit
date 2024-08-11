@@ -2,14 +2,13 @@
 // Created by Voric on 11/08/2024.
 //
 
-#ifndef MENUSTATE_H
-#define MENUSTATE_H
+#ifndef DEATHSTATE_H
+#define DEATHSTATE_H
 
 #include "State.h"
 #include "Game.h"
-#include <iostream>
 
-class MenuState : public State {
+class DeathState : public State {
 public:
     void handleInput(Game& game) override;
     void update(Game& game) override;
@@ -17,9 +16,9 @@ public:
 
 private:
     sf::Font font;
-    sf::Text title;
-    sf::Text playButton;
+    sf::Text deathText;
+    sf::Text playAgainButton;
+    sf::Text menuButton;
 };
 
-
-#endif //MENUSTATE_H
+#endif //DEATHSTATE_H
