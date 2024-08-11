@@ -13,17 +13,17 @@ Car::Car() : speed(200.0f), direction(0.0f, 0.0f) {
 void Car::handleInput() {
     direction = sf::Vector2f(0.0f, 0.0f);
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-        direction.y -= 1.0f;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+        direction.y -= 0.01f;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-        direction.y += 1.0f;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+        direction.y += 0.01f;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-        direction.x -= 1.0f;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+        direction.x -= 0.01f;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-        direction.x += 1.0f;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+        direction.x += 0.01f;
     }
 }
 
