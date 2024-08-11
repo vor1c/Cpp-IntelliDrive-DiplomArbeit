@@ -5,7 +5,8 @@
 #include "../include/GameState.h"
 #include "../include/PauseState.h"
 #include "../include/DeathState.h"
-
+#include "../include/Car.h"
+#include "../include/Game.h"
 
 GameState::GameState() : car() {}
 
@@ -24,7 +25,7 @@ void GameState::handleInput(Game& game) {
 }
 
 void GameState::update(Game& game) {
-    car.update();
+    car.update(game.dt);
 
     // Check collision with green (out of bounds)
     if (car.getBounds().left < 100 || car.getBounds().left + car.getBounds().width > 700) {

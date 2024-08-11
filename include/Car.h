@@ -6,7 +6,7 @@
 #include <vector>
 #include "SFML/Graphics/RectangleShape.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
-
+#include <cmath>
 #ifndef CAR_H
 #define CAR_H
 
@@ -15,7 +15,7 @@ public:
     Car();
 
     void handleInput();
-    void update();
+    void update(float dt);
     void render(sf::RenderWindow& window);
 
     sf::FloatRect getBounds() const;

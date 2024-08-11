@@ -3,16 +3,19 @@
 //
 
 #include "../include/Game.h"
-
 #include <iostream>
 #include <../include/MenuState.h>
+#include <SFML/System/Clock.hpp>
 
 Game::Game() : window(sf::VideoMode(800, 600), "IntelliDrive")
 {
+    car = std::make_shared<Car>();
   pushState(std::make_shared<MenuState>());
 }
 
 void Game::run() {
+    sf::Time deltaTime = clock.restart();
+    dt = deltaTime.asSeconds();
     while (window.isOpen()) {
 
         auto currentState = getCurrentState();
