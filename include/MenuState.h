@@ -10,6 +10,7 @@
 #include <iostream>
 
 class MenuState : public State {
+
 public:
     void handleInput(Game& game) override;
     void update(Game& game) override;

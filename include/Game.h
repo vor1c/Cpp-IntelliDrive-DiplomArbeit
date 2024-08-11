@@ -16,6 +16,7 @@
 class Game {
 public:
     Game();
+    ~Game();
     void run();
     float dt;
     void pushState(std::shared_ptr<State> state);

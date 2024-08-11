@@ -6,21 +6,24 @@
 #include <iostream>
 #include <../include/MenuState.h>
 #include <SFML/System/Clock.hpp>
+sf::Event event;
 
-Game::Game() : window(sf::VideoMode(800, 600), "IntelliDrive")
+Game::Game() : window(sf::VideoMode(1920, 1080), "IntelliDrive", sf::Style::Fullscreen)
 {
     car = std::make_shared<Car>();
   pushState(std::make_shared<MenuState>());
 }
-
+Game::~Game() {
+    // Cleanup code if needed
+    std::cout << "Game is exiting..." << std::endl;
+}
 void Game::run() {
-    sf::Time deltaTime = clock.restart();
-    dt = deltaTime.asSeconds();
+    sf::Clock clock;
     while (window.isOpen()) {
-
+        sf::Time deltaTime = clock.restart();
+        dt = deltaTime.asSeconds();
         auto currentState = getCurrentState();
         if (currentState) {
-            std::cout<<"Game1" << std::endl;
             currentState->handleInput(*this);
             currentState->update(*this);
             window.clear();
@@ -29,6 +32,7 @@ void Game::run() {
         }
     }
 }
+
 
 void Game::pushState(std::shared_ptr<State> state) {
     states.push_back(state);
