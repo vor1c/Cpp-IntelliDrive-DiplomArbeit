@@ -11,7 +11,7 @@
 #include "State.h"
 #include <iostream>
 
-class MenuState : public State { // Inherit from State
+class MenuState : public State {
 public:
     MenuState();
 
@@ -39,9 +39,8 @@ private:
     sf::Text title;
     sf::Text copyrightText;
     sf::Text versionText;
-    sf::Text changeBgButton; // New button to change background
+    sf::Text changeBgButton;
 
-    // Background Index
     int backgroundIndex;
 };
 
