@@ -40,6 +40,7 @@ file(MAKE_DIRECTORY ${RESOURCE_DIR})
 # Get all files in the resources directory
 file(GLOB RESOURCE_FILES ${PROJECT_SOURCE_DIR}/resources/*)
 
+
 # Add custom command to copy resource files
 foreach(resource ${RESOURCE_FILES})
     get_filename_component(resource_name ${resource} NAME)
