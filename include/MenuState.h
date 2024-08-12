@@ -39,6 +39,7 @@ private:
     sf::Text title;
     sf::Text copyrightText;
     sf::Text versionText;
+    sf::Text changeBgButton; // New button to change background
 
     // Background Index
     int backgroundIndex;

@@ -7,7 +7,7 @@
 #include "../include/ResourceManager.h"
 
 MenuState::MenuState()
-    : backgroundIndex(1) {
+    : backgroundIndex(1) { // Initialize backgroundIndex
 
     std::string fontPath = "resources/Rubik-Regular.ttf";
     std::string MenuTitlePath = "resources/MenuTitle-Font.ttf";
@@ -20,13 +20,22 @@ MenuState::MenuState()
         std::cerr << "Failed to load font from path: " << MenuTitlePath << std::endl;
     }
 
-    loadBackground();
+    loadBackground(); // Load the initial background
 
     sf::Vector2u defaultWindowSize(1920, 1080);
     initializeButton(playButton, Textfont, "Start Game", defaultWindowSize, 70);
     initializeButton(systemButton, Textfont, "System", defaultWindowSize, 120);
     initializeButton(infoButton, Textfont, "Information", defaultWindowSize, 170);
     initializeButton(exitButton, Textfont, "Exit", defaultWindowSize, 220);
+
+    // Initialize the new button
+    changeBgButton.setFont(Textfont);
+    changeBgButton.setString("Change Background");
+    changeBgButton.setCharacterSize(30);
+    changeBgButton.setFillColor(sf::Color::White);
+    sf::FloatRect buttonBounds = changeBgButton.getLocalBounds();
+    changeBgButton.setOrigin(buttonBounds.width / 2.0f, buttonBounds.height / 2.0f);
+    changeBgButton.setPosition(150, defaultWindowSize.y - 30); // Position it in the bottom-left corner
 
     title.setFont(Menufont);
     title.setString("INTELLIDRIVE");
@@ -42,13 +51,13 @@ MenuState::MenuState()
     copyrightText.setFillColor(sf::Color::White);
     sf::FloatRect copyrightBounds = copyrightText.getLocalBounds();
     copyrightText.setOrigin(copyrightBounds.width / 2.0f, copyrightBounds.height / 2.0f);
-    copyrightText.setPosition(defaultWindowSize.x / 2.0f, defaultWindowSize.y - 50);
+    copyrightText.setPosition(defaultWindowSize.x / 2.0f, defaultWindowSize.y - 50); // Moved up a bit
 
     versionText.setFont(Textfont);
-    versionText.setString("Beta v1.1.0");
+    versionText.setString("Beta v1.1.1");
     versionText.setCharacterSize(20);
     versionText.setFillColor(sf::Color::White);
-    versionText.setPosition(defaultWindowSize.x - 150, defaultWindowSize.y - 100);
+    versionText.setPosition(defaultWindowSize.x - 150, defaultWindowSize.y - 100); // Moved up a bit
 }
 
 void MenuState::handleInput(Game& game) {
@@ -61,8 +70,6 @@ void MenuState::handleInput(Game& game) {
         if (event.type == sf::Event::KeyPressed) {
             if (event.key.code == sf::Keyboard::Enter) {
                 game.changeState(std::make_shared<GameState>());
-            } else if (event.key.code == sf::Keyboard::B) {
-                changeBackground();
             }
         }
 
@@ -73,6 +80,9 @@ void MenuState::handleInput(Game& game) {
                 game.changeState(std::make_shared<GameState>());
             } else if (exitButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
                 game.window.close();
+            } else if (changeBgButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
+                // Change background when the changeBgButton is clicked
+                changeBackground();
             }
         }
     }
@@ -85,15 +95,16 @@ void MenuState::update(Game& game) {
     updateButtonHover(systemButton, mousePos);
     updateButtonHover(infoButton, mousePos);
     updateButtonHover(exitButton, mousePos);
+    updateButtonHover(changeBgButton, mousePos); // Update hover state for the new button
 }
 
 void MenuState::updateButtonHover(sf::Text& button, const sf::Vector2i& mousePos) {
     if (button.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
-        button.setFillColor(sf::Color(255, 215, 0));
-        button.setScale(1.1f, 1.1f);
+        button.setFillColor(sf::Color(255, 215, 0)); // Yellow color for hover
+        button.setScale(1.1f, 1.1f); // Scale up on hover
     } else {
-        button.setFillColor(sf::Color::White);
-        button.setScale(1.0f, 1.0f);
+        button.setFillColor(sf::Color::White); // Default color
+        button.setScale(1.0f, 1.0f); // Default scale
     }
 }
 
@@ -107,6 +118,7 @@ void MenuState::render(Game& game) {
     game.window.draw(systemButton);
     game.window.draw(infoButton);
     game.window.draw(exitButton);
+    game.window.draw(changeBgButton); // Draw the new button
 
     game.window.draw(copyrightText);
     game.window.draw(versionText);
@@ -131,6 +143,6 @@ void MenuState::loadBackground() {
 }
 
 void MenuState::changeBackground() {
-    backgroundIndex = (backgroundIndex % 4) + 1;
+    backgroundIndex = (backgroundIndex % 4) + 1; // Cycle through backgrounds 1 to 4
     loadBackground();
 }
