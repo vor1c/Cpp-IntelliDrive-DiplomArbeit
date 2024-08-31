@@ -8,7 +8,10 @@
 #include "../include/Car.h"
 #include "../include/Game.h"
 
-GameState::GameState() : car() {}
+GameState::GameState() : car() {
+    // Set the car texture to the selected texture
+    car.setTexture(game.getSelectedCarTexture());
+}
 
 void GameState::handleInput(Game& game) {
     sf::Event event;
@@ -27,7 +30,6 @@ void GameState::handleInput(Game& game) {
 void GameState::update(Game& game) {
     car.update(game.dt);
 
-    // Check collision with green (out of bounds)
     if (car.getBounds().left < 100 || car.getBounds().left + car.getBounds().width > 700) {
         game.changeState(std::make_shared<DeathState>());
     }
@@ -37,7 +39,7 @@ void GameState::render(Game& game) {
     // Draw road
     sf::RectangleShape road(sf::Vector2f(600, 600));
     road.setPosition(100, 0);
-    road.setFillColor(sf::Color{ 0x808080 }); //Grau https://learnsfml.com/basics/graphics/how-to-use-colors-in-sfml/
+    road.setFillColor(sf::Color{ 0x808080 });
     game.window.draw(road);
 
     // Draw car

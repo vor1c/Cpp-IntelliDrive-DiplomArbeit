@@ -34,7 +34,7 @@ private:
     // UI Elements
     sf::Text playButton;
     sf::Text systemButton;
-    sf::Text infoButton;
+    sf::Text carButton;
     sf::Text exitButton;
     sf::Text title;
     sf::Text copyrightText;

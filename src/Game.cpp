@@ -14,7 +14,6 @@ Game::Game() : window(sf::VideoMode(1920, 1080), "IntelliDrive", sf::Style::Full
   pushState(std::make_shared<MenuState>());
 }
 Game::~Game() {
-    // Cleanup code if needed
     std::cout << "Game is exiting..." << std::endl;
 }
 void Game::run() {
@@ -52,4 +51,12 @@ void Game::changeState(std::shared_ptr<State> state) {
 std::shared_ptr<State> Game::getCurrentState() {
     if (states.empty()) return nullptr;
     return states.back();
+}
+
+void Game::setSelectedCarTexture(const sf::Texture& texture) {
+    selectedCarTexture = texture;
+}
+
+const sf::Texture& Game::getSelectedCarTexture() const {
+    return selectedCarTexture;
 }

@@ -27,12 +27,17 @@ public:
 
     sf::RenderWindow window;
 
+    // Add these methods:
+    void setSelectedCarTexture(const sf::Texture& texture);
+    const sf::Texture& getSelectedCarTexture() const;
+
 private:
-
-    sf::Clock clock; // Clock to measure time between frames
-    std::shared_ptr<Car> car; // The car object
+    sf::Clock clock;
+    std::shared_ptr<Car> car;
     std::vector<std::shared_ptr<State>> states;
-};
 
+    // Add this variable:
+    sf::Texture selectedCarTexture;  // Texture of the selected car
+};
 
 #endif //GAME_H

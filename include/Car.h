@@ -7,6 +7,7 @@
 #include "SFML/Graphics/RectangleShape.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
 #include <cmath>
+#include "SFML/Graphics/Sprite.hpp"
 #ifndef CAR_H
 #define CAR_H
 
@@ -19,9 +20,10 @@ public:
     void render(sf::RenderWindow& window);
 
     sf::FloatRect getBounds() const;
+    void setTexture(const sf::Texture& texture);  // Add this method
 
 private:
-    sf::RectangleShape carShape;
+    sf::Sprite carSprite;  // Change to sprite
     float speed;
     sf::Vector2f direction;
 };

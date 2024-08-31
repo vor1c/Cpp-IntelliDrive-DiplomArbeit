@@ -6,9 +6,13 @@
 
 // https://en.sfml-dev.org/forums/index.php?topic=7068.0
 Car::Car() : speed(300.0f), direction(0.0f, 0.0f) {
-    carShape.setSize(sf::Vector2f(16, 16));
-    carShape.setFillColor(sf::Color::Red);
-    carShape.setPosition(400, 300);
+
+}
+
+void Car::setTexture(const sf::Texture& texture) {
+    carSprite.setTexture(texture);
+    carSprite.setOrigin(carSprite.getLocalBounds().width / 2, carSprite.getLocalBounds().height / 2); // Center the origin for rotation
+    carSprite.setPosition(400, 300);  // Default starting position
 }
 
 void Car::handleInput() {
@@ -36,13 +40,13 @@ void Car::handleInput() {
 
 void Car::update(float dt) {
     // Move car based on direction and speed
-    carShape.move(direction * speed * dt);
+    carSprite.move(direction * speed * dt);
 }
 
 void Car::render(sf::RenderWindow& window) {
-    window.draw(carShape);
+    window.draw(carSprite);
 }
 
 sf::FloatRect Car::getBounds() const {
-    return carShape.getGlobalBounds();
+    return carSprite.getGlobalBounds();
 }

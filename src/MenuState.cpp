@@ -3,6 +3,8 @@
 //
 
 #include "../include/MenuState.h"
+
+#include "CarChooseState.h"
 #include "../include/GameState.h"
 #include "../include/ResourceManager.h"
 
@@ -24,8 +26,8 @@ MenuState::MenuState()
 
     sf::Vector2u defaultWindowSize(1920, 1080);
     initializeButton(playButton, Textfont, "Start Game", defaultWindowSize, 70);
-    initializeButton(systemButton, Textfont, "System", defaultWindowSize, 120);
-    initializeButton(infoButton, Textfont, "Information", defaultWindowSize, 170);
+    initializeButton(systemButton, Textfont, "System", defaultWindowSize, 170);
+    initializeButton(carButton, Textfont, "Choose your Car", defaultWindowSize, 120);
     initializeButton(exitButton, Textfont, "Exit", defaultWindowSize, 220);
 
     changeBgButton.setFont(Textfont);
@@ -53,7 +55,7 @@ MenuState::MenuState()
     copyrightText.setPosition(defaultWindowSize.x / 2.0f, defaultWindowSize.y - 50);
 
     versionText.setFont(Textfont);
-    versionText.setString("Beta v1.1.1");
+    versionText.setString("Beta v1.1.2");
     versionText.setCharacterSize(20);
     versionText.setFillColor(sf::Color::White);
     versionText.setPosition(defaultWindowSize.x - 150, defaultWindowSize.y - 100);
@@ -65,18 +67,13 @@ void MenuState::handleInput(Game& game) {
         if (event.type == sf::Event::Closed) {
             game.window.close();
         }
-
-        if (event.type == sf::Event::KeyPressed) {
-            if (event.key.code == sf::Keyboard::Enter) {
-                game.changeState(std::make_shared<GameState>());
-            }
-        }
-
         if (event.type == sf::Event::MouseButtonPressed) {
             sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
 
             if (playButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
                 game.changeState(std::make_shared<GameState>());
+            } else if (carButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
+                game.changeState(std::make_shared<CarChoosingState>());
             } else if (exitButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
                 game.window.close();
             } else if (changeBgButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
@@ -86,12 +83,13 @@ void MenuState::handleInput(Game& game) {
     }
 }
 
+
 void MenuState::update(Game& game) {
     sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
 
     updateButtonHover(playButton, mousePos);
     updateButtonHover(systemButton, mousePos);
-    updateButtonHover(infoButton, mousePos);
+    updateButtonHover(carButton, mousePos);
     updateButtonHover(exitButton, mousePos);
     updateButtonHover(changeBgButton, mousePos);
 }
@@ -113,7 +111,7 @@ void MenuState::render(Game& game) {
 
     game.window.draw(playButton);
     game.window.draw(systemButton);
-    game.window.draw(infoButton);
+    game.window.draw(carButton);
     game.window.draw(exitButton);
     game.window.draw(changeBgButton);
 
@@ -141,5 +139,6 @@ void MenuState::loadBackground() {
 
 void MenuState::changeBackground() {
     backgroundIndex = (backgroundIndex % 4) + 1;
+    
     loadBackground();
 }
