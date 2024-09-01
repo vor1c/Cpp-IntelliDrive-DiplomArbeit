@@ -108,13 +108,11 @@ void MenuState::render(Game& game) {
     game.window.clear();
     game.window.draw(backgroundSprite);
     game.window.draw(title);
-
     game.window.draw(playButton);
     game.window.draw(systemButton);
     game.window.draw(carButton);
     game.window.draw(exitButton);
     game.window.draw(changeBgButton);
-
     game.window.draw(copyrightText);
     game.window.draw(versionText);
 }

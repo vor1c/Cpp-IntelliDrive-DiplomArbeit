@@ -11,7 +11,7 @@ sf::Event event;
 Game::Game() : window(sf::VideoMode(1920, 1080), "IntelliDrive", sf::Style::Fullscreen)
 {
     car = std::make_shared<Car>();
-  pushState(std::make_shared<MenuState>());
+    pushState(std::make_shared<MenuState>());
 }
 Game::~Game() {
     std::cout << "Game is exiting..." << std::endl;

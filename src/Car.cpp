@@ -11,8 +11,8 @@ Car::Car() : speed(300.0f), direction(0.0f, 0.0f) {
 
 void Car::setTexture(const sf::Texture& texture) {
     carSprite.setTexture(texture);
-    carSprite.setOrigin(carSprite.getLocalBounds().width / 2, carSprite.getLocalBounds().height / 2); // Center the origin for rotation
-    carSprite.setPosition(400, 300);  // Default starting position
+    carSprite.setOrigin(carSprite.getLocalBounds().width / 2, carSprite.getLocalBounds().height / 2);
+    carSprite.setPosition(400, 300);
 }
 
 void Car::handleInput() {
@@ -31,7 +31,6 @@ void Car::handleInput() {
         direction.x += 1.0f;
     }
 
-    // Normalize direction to prevent faster diagonal movement
     if (direction.x != 0.0f || direction.y != 0.0f) {
         float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
         direction /= length;
@@ -39,7 +38,6 @@ void Car::handleInput() {
 }
 
 void Car::update(float dt) {
-    // Move car based on direction and speed
     carSprite.move(direction * speed * dt);
 }
 

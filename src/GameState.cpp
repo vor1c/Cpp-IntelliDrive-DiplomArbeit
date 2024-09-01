@@ -29,7 +29,6 @@ void GameState::handleInput(Game& game) {
 
 void GameState::update(Game& game) {
     car.update(game.dt);
-
     if (car.getBounds().left < 100 || car.getBounds().left + car.getBounds().width > 700) {
         game.changeState(std::make_shared<DeathState>());
     }
