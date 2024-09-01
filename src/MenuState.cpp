@@ -71,7 +71,7 @@ void MenuState::handleInput(Game& game) {
             sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
 
             if (playButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
-                game.changeState(std::make_shared<GameState>());
+                game.changeState(std::make_shared<GameState>(game));
             } else if (carButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
                 game.changeState(std::make_shared<CarChoosingState>());
             } else if (exitButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {

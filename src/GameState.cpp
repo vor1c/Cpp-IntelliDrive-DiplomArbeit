@@ -8,8 +8,8 @@
 #include "../include/Car.h"
 #include "../include/Game.h"
 
-GameState::GameState() : car() {
-    // Set the car texture to the selected texture
+GameState::GameState(Game& game) : car() {
+    // Set the car texture to the selected texture from the Game object
     car.setTexture(game.getSelectedCarTexture());
 }
 

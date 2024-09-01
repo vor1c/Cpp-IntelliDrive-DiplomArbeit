@@ -5,26 +5,32 @@
 #ifndef CARCHOOSINGSTATE_H
 #define CARCHOOSINGSTATE_H
 
-#include "State.h"
-#include "SFML/Graphics.hpp"
+#include <SFML/Graphics.hpp>
 #include <vector>
+#include <memory>
+#include <../include/State.h>
+
+class Game;
+class MenuState;
 
 class CarChoosingState : public State {
 public:
     CarChoosingState();
-    void handleInput(Game& game) override;
-    void update(Game& game) override;
-    void render(Game& game) override;
+    void handleInput(Game& game);
+    void update(Game& game);
+    void render(Game& game);
 
 private:
     void loadCars();
     void selectCar(int index);
 
-    std::vector<sf::Sprite> carSprites;
-    std::vector<sf::Texture> carTextures;  // We need to keep the textures in memory.
-    int selectedCarIndex;
     sf::Font font;
     sf::Text titleText;
+    std::vector<sf::Texture> carTextures;
+    std::vector<sf::Sprite> carSprites;
+    int selectedCarIndex;
+    bool updateNeeded; // Flag to indicate if an update is needed
 };
 
 #endif // CARCHOOSINGSTATE_H
+

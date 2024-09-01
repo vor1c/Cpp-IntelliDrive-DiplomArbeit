@@ -11,7 +11,7 @@
 
 class GameState : public State {
 public:
-    GameState();
+    GameState(Game& game);
     void handleInput(Game& game) override;
     void update(Game& game) override;
     void render(Game& game) override;

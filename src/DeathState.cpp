@@ -15,7 +15,7 @@ void DeathState::handleInput(Game& game) {
             game.window.close();
 
         if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
-            game.changeState(std::make_shared<GameState>());
+            game.changeState(std::make_shared<GameState>(game));
         }
 
         if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::M) {
