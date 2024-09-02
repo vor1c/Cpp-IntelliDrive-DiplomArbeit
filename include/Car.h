@@ -1,5 +1,5 @@
 //
-// Created by Voric on 11/08/2024.
+// Created by Voric and tobisdev on 11/08/2024.
 //
 
 #include <iostream>
@@ -21,15 +21,20 @@ public:
     void render(sf::RenderWindow& window);
 
     sf::FloatRect getBounds() const;
-    void setTexture(const sf::Texture& texture);  // Add this method
+    void setTexture(const sf::Texture& texture);
 
 private:
     sf::Sprite carSprite;  // Change to sprite
     sf::Vector2f direction;
 
-    float max_speed = 0.1f;
+    float rotation_angle = 0.0f;
+    float angular_acceleration = 0.0f;
+    float angular_acceleration_constant = 1000.0f;
+
+    float acceleration = 0.0f;
     float acceleration_constant = 1.0f;
-    sf::Vector2f acceleration{0, 0};
+
+    float friction = 0.999f;
 
     sf::Vector2f previous_position;
 };
