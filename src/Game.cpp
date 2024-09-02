@@ -16,6 +16,7 @@ Game::Game() : window(sf::VideoMode(1920, 1080), "IntelliDrive", sf::Style::Full
 Game::~Game() {
     std::cout << "Game is exiting..." << std::endl;
 }
+
 void Game::run() {
     sf::Clock clock;
     while (window.isOpen()) {
