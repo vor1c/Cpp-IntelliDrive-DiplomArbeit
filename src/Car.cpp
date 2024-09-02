@@ -5,40 +5,45 @@
 #include "../include/Car.h"
 
 // https://en.sfml-dev.org/forums/index.php?topic=7068.0
-Car::Car() : speed(300.0f), direction(0.0f, 0.0f) {
 
-}
+Car::Car(){
+    carSprite.setPosition(200, 200);
+    previous_position = carSprite.getPosition();
+};
 
 void Car::setTexture(const sf::Texture& texture) {
     carSprite.setTexture(texture);
     carSprite.setOrigin(carSprite.getLocalBounds().width / 2, carSprite.getLocalBounds().height / 2);
-    carSprite.setPosition(400, 300);
+
 }
 
 void Car::handleInput() {
-    direction = sf::Vector2f(0.0f, 0.0f);
-
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        direction.y -= 1.0f;
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        direction.y += 1.0f;
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-        direction.x -= 1.0f;
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-        direction.x += 1.0f;
-    }
-
-    if (direction.x != 0.0f || direction.y != 0.0f) {
-        float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
-        direction /= length;
+        acceleration = {0, acceleration_constant};
+    }else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+        acceleration = {0, -acceleration_constant};
+    }else{
+        acceleration = {0,0};
     }
 }
 
 void Car::update(float dt) {
-    carSprite.move(direction * speed * dt);
+    std::cout << "Position: [ " << carSprite.getPosition().x << " / " << carSprite.getPosition().y <<  " ]\n";
+
+    sf::Vector2f newPosition = 2.0f * carSprite.getPosition() - previous_position + (acceleration * dt);
+
+    sf::Vector2f velocity = newPosition - carSprite.getPosition();
+
+    float speed = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
+
+    if (speed > max_speed) {
+        velocity *= (max_speed / speed);
+
+        newPosition = carSprite.getPosition() + velocity;
+    }
+
+    previous_position = carSprite.getPosition();
+    carSprite.setPosition(newPosition);
 }
 
 void Car::render(sf::RenderWindow& window) {

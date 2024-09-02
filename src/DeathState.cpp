@@ -27,7 +27,6 @@ void DeathState::handleInput(Game& game) {
 void DeathState::update(Game& game) {}
 
 void DeathState::render(Game& game) {
-    std::cout<<"DeathState 1" << std::endl;
 
     std::string fontPath = "resources/Rubik-Regular.ttf";
 
