@@ -9,7 +9,6 @@ Car::Car() : speed(300.0f), direction(0.0f, 0.0f) {
 
 }
 
-
 void Car::setTexture(const sf::Texture& texture) {
     carSprite.setTexture(texture);
     carSprite.setOrigin(carSprite.getLocalBounds().width / 2, carSprite.getLocalBounds().height / 2);
