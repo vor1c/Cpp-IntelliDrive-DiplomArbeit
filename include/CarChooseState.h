@@ -23,14 +23,24 @@ public:
 private:
     void loadCars();
     void selectCar(int index);
+    void renderStatsBars(Game& game);
 
     sf::Font font;
+    sf::Font titlefont;
     sf::Text titleText;
+    sf::Text carStatsText;
+    sf::Text driveTypeText;
     std::vector<sf::Texture> carTextures;
     std::vector<sf::Sprite> carSprites;
+    std::vector<std::string> carNames;
+    std::vector<int> maxSpeeds;
+    std::vector<int> handlings;
+    std::vector<int> accelerations;
+    std::vector<int> weights;
+    std::vector<int> maxPowers;
+    std::vector<float> torques;
+    std::vector<std::string> driveTypes;
     int selectedCarIndex;
-    bool updateNeeded; // Flag to indicate if an update is needed
 };
 
 #endif // CARCHOOSINGSTATE_H
-
