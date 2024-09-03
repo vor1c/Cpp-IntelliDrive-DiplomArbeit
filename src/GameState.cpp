@@ -9,7 +9,6 @@
 #include "../include/Game.h"
 
 GameState::GameState(Game& game) : car() {
-    // Set the car texture to the selected texture from the Game object
     car.setTexture(game.getSelectedCarTexture());
 }
 
@@ -35,12 +34,11 @@ void GameState::update(Game& game) {
 }
 
 void GameState::render(Game& game) {
-    // Draw road
     sf::RectangleShape road(sf::Vector2f(game.window.getSize().x - 20, game.window.getSize().y - 20));
     road.setPosition(10, 10);
+
     road.setFillColor(sf::Color{ 0x808080 });
     game.window.draw(road);
 
-    // Draw car
     car.render(game.window);
 }
