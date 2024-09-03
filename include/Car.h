@@ -32,9 +32,9 @@ private:
     float angular_acceleration_constant = 1000.0f;
 
     float acceleration = 0.0f;
-    float acceleration_constant = 1.0f;
+    float acceleration_constant = 11.0f;
 
-    float friction = 0.999f;
+    float friction = 0.99f;
 
     sf::Vector2f previous_position;
 };

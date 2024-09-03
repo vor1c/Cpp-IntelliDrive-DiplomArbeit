@@ -41,7 +41,7 @@ void Car::update(float dt) {
 
     sf::Vector2f velocity = (carSprite.getPosition() - previous_position) * friction;
 
-    sf::Vector2f newPosition = carSprite.getPosition() + ((carSprite.getPosition() - previous_position) + forward_direction * (acceleration * dt)) * friction;
+    sf::Vector2f newPosition = carSprite.getPosition() + (carSprite.getPosition() - previous_position + forward_direction * (acceleration * dt)) * friction;
 
     float speed = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
 
