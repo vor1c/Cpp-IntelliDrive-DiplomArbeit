@@ -1,44 +1,62 @@
 //
-// Created by Voric on 11/08/2024.
+// Created by Voric and tobisdev on 11/08/2024.
 //
 
 #include "../include/Car.h"
 
 // https://en.sfml-dev.org/forums/index.php?topic=7068.0
-Car::Car() : speed(300.0f), direction(0.0f, 0.0f) {
 
-}
+Car::Car(){
+    carSprite.setPosition(400, 400);
+    previous_position = carSprite.getPosition();
+};
 
 void Car::setTexture(const sf::Texture& texture) {
     carSprite.setTexture(texture);
     carSprite.setOrigin(carSprite.getLocalBounds().width / 2, carSprite.getLocalBounds().height / 2);
-    carSprite.setPosition(400, 300);
 }
 
 void Car::handleInput() {
-    direction = sf::Vector2f(0.0f, 0.0f);
-
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        direction.y -= 1.0f;
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        direction.y += 1.0f;
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-        direction.x -= 1.0f;
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-        direction.x += 1.0f;
+        acceleration = acceleration_constant;
+    }else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+        acceleration = -acceleration_constant * 0.5f;
+    }else{
+        acceleration = 0.0f;
     }
 
-    if (direction.x != 0.0f || direction.y != 0.0f) {
-        float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
-        direction /= length;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+        angular_acceleration = -angular_acceleration_constant;
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+        angular_acceleration = angular_acceleration_constant;
+    } else {
+        angular_acceleration = 0.0f;
     }
 }
 
 void Car::update(float dt) {
-    carSprite.move(direction * speed * dt);
+
+    float radian_angle = rotation_angle * (3.14159265358979323846f / 180.0f);
+    sf::Vector2f forward_direction(std::sin(radian_angle), -std::cos(radian_angle));
+
+    sf::Vector2f velocity = (carSprite.getPosition() - previous_position) * friction;
+
+    sf::Vector2f newPosition = carSprite.getPosition() + (carSprite.getPosition() - previous_position + forward_direction * (acceleration * dt)) * friction;
+
+    float speed = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
+
+    rotation_angle += angular_acceleration * speed * dt;
+
+    if (rotation_angle >= 360.0f) {
+        rotation_angle -= 360.0f;
+    } else if (rotation_angle < 0.0f) {
+        rotation_angle += 360.0f;
+    }
+
+    carSprite.setRotation(rotation_angle);
+
+    previous_position = carSprite.getPosition();
+    carSprite.setPosition(newPosition);
 }
 
 void Car::render(sf::RenderWindow& window) {

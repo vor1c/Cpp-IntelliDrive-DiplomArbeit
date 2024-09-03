@@ -28,14 +28,15 @@ void GameState::handleInput(Game& game) {
 
 void GameState::update(Game& game) {
     car.update(game.dt);
-    if (car.getBounds().left < 100 || car.getBounds().left + car.getBounds().width > 700) {
-        game.changeState(std::make_shared<DeathState>());
-    }
+    //if (car.getBounds().left < 100 || car.getBounds().left + car.getBounds().width > 700) {
+    //    game.changeState(std::make_shared<DeathState>());
+    //}
 }
 
 void GameState::render(Game& game) {
-    sf::RectangleShape road(sf::Vector2f(600, 600));
-    road.setPosition(100, 0);
+    sf::RectangleShape road(sf::Vector2f(game.window.getSize().x - 20, game.window.getSize().y - 20));
+    road.setPosition(10, 10);
+
     road.setFillColor(sf::Color{ 0x808080 });
     game.window.draw(road);
 
