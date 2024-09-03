@@ -10,8 +10,12 @@
 #include <chrono>
 #include <thread>
 
+
+
 CarChoosingState::CarChoosingState() : selectedCarIndex(0) {
-    sf::Vector2u defaultWindowSize(1920, 1080);
+
+    defaultWindowSize = sf::Vector2u(1920, 1080);
+
     if (!font.loadFromFile("resources/Rubik-Regular.ttf")) {
         std::cerr << "Failed to load font!" << std::endl;
     }
@@ -19,25 +23,28 @@ CarChoosingState::CarChoosingState() : selectedCarIndex(0) {
         std::cerr << "Failed to load font!" << std::endl;
     }
 
+    loadCars();
+
     titleText.setFont(titlefont);
     titleText.setString("CAR SELECTION");
     titleText.setCharacterSize(125);
     titleText.setFillColor(sf::Color::White);
-    titleText.setPosition(defaultWindowSize.x / 2.0f - 350, (defaultWindowSize.y / 4.0f - 200.f));
+    titleText.setPosition(defaultWindowSize.x / 2.0f - (titleText.getLocalBounds().width / 2), 40);
 
-    // Set up car stats text
     carStatsText.setFont(font);
     carStatsText.setCharacterSize(25);
     carStatsText.setFillColor(sf::Color::White);
-    carStatsText.setPosition(100, 750);  // Placed near the bottom left
+    carStatsText.setPosition(100, 750);
 
-    // Drive type and power text
     driveTypeText.setFont(font);
     driveTypeText.setCharacterSize(30);
     driveTypeText.setFillColor(sf::Color::White);
-    driveTypeText.setPosition(1000, 900);  // Positioned above the stats bars
+    driveTypeText.setPosition(1000, 900);
 
-    loadCars();
+    dividerline.setSize(sf::Vector2f(1920.0f, 5.0f));
+    dividerline.setFillColor(sf::Color(80,80,80));
+    dividerline.setPosition(0, 850);
+
     selectCar(0);
 }
 
@@ -57,11 +64,12 @@ void CarChoosingState::loadCars() {
             sf::Texture texture;
             if (texture.loadFromFile("resources/Car" + std::to_string(i) + ".png")) {
                 carTextures.push_back(texture);
-
                 sf::Sprite sprite;
                 sprite.setTexture(carTextures.back());
+                sprite.setOrigin(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
                 sprite.setScale(2.0f, 2.0f);
-                sprite.setPosition(860.0f, 300.0f); // Centered horizontally, with space above
+                sprite.setPosition(defaultWindowSize.x / 2.0f , 500.0f);
+                sprite.setScale(3.3f, 3.3f);
                 carSprites.push_back(sprite);
             } else {
                 std::cerr << "Failed to load car " << i << " texture!" << std::endl;
@@ -99,9 +107,14 @@ void CarChoosingState::handleInput(Game& game) {
         }
     }
 }
-
+// https://www.sfml-dev.org/tutorials/2.6/graphics-transform.php
 void CarChoosingState::update(Game& game) {
-
+    sf::Sprite &selectedCar = carSprites[selectedCarIndex];
+    rotationAngle += 0.01f;
+    if (rotationAngle >= 360.0f) {
+        rotationAngle = 0.0f;
+    }
+    selectedCar.setRotation(rotationAngle);
 }
 
 void CarChoosingState::render(Game& game) {
@@ -110,6 +123,7 @@ void CarChoosingState::render(Game& game) {
     game.window.draw(carSprites[selectedCarIndex]);
     game.window.draw(driveTypeText);
     game.window.draw(carStatsText);
+    game.window.draw(dividerline);
     renderStatsBars(game);
     std::cout << "Displayed." << std::endl;
 }
@@ -119,7 +133,7 @@ void CarChoosingState::selectCar(int index) {
         carSprites[i].setColor(sf::Color::White);
     }
     if (index < carSprites.size()) {
-        carSprites[index].setColor(sf::Color::Yellow);
+
     }
 
     carStatsText.setString(
@@ -129,26 +143,42 @@ void CarChoosingState::selectCar(int index) {
         "Max Torque: " + std::to_string(torques[index]) + " kgm"
     );
 
-    // Update drive type and power display
     driveTypeText.setString(driveTypes[index] + " " + std::to_string(maxPowers[index]) + "ps");
 }
 
 void CarChoosingState::renderStatsBars(Game& game) {
+
+    float legendheight =  (dividerline.getGlobalBounds().height + dividerline.getPosition().y + 1080) / 2;
+
+    sf::Text statBarsLabel;
+    statBarsLabel.setFont(font);
+    statBarsLabel.setCharacterSize(25);
+    statBarsLabel.setFillColor(sf::Color::White);
+
+    statBarsLabel.setString("Max Speed");
     float barWidth = 20.0f * maxSpeeds[selectedCarIndex];
     sf::RectangleShape speedBar(sf::Vector2f(barWidth, 20.0f));
     speedBar.setFillColor(sf::Color::Red);
-    speedBar.setPosition(400.0f, 850.0f);
+    speedBar.setPosition(315.0f, legendheight - 60);
+    statBarsLabel.setPosition(300.0f - statBarsLabel.getGlobalBounds().width, legendheight - 65);
     game.window.draw(speedBar);
+    game.window.draw(statBarsLabel);
 
+    statBarsLabel.setString("Handling");
     barWidth = 20.0f * handlings[selectedCarIndex];
     sf::RectangleShape handlingBar(sf::Vector2f(barWidth, 20.0f));
     handlingBar.setFillColor(sf::Color::Yellow);
-    handlingBar.setPosition(400.0f, 900.0f);
+    handlingBar.setPosition(315.0f, legendheight - 10);
+    statBarsLabel.setPosition(300.0f - statBarsLabel.getGlobalBounds().width, legendheight - 15);
     game.window.draw(handlingBar);
+    game.window.draw(statBarsLabel);
 
+    statBarsLabel.setString("Acceleration");
     barWidth = 20.0f * accelerations[selectedCarIndex];
     sf::RectangleShape accelerationBar(sf::Vector2f(barWidth, 20.0f));
     accelerationBar.setFillColor(sf::Color::Blue);
-    accelerationBar.setPosition(400.0f, 950.0f);
+    accelerationBar.setPosition(315.0f, legendheight + 40);
+    statBarsLabel.setPosition(300.0f - statBarsLabel.getGlobalBounds().width, legendheight + 35);
     game.window.draw(accelerationBar);
+    game.window.draw(statBarsLabel);
 }

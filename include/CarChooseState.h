@@ -30,9 +30,12 @@ private:
     sf::Text titleText;
     sf::Text carStatsText;
     sf::Text driveTypeText;
+    sf::Vector2u defaultWindowSize;
+    sf::RectangleShape dividerline;
     std::vector<sf::Texture> carTextures;
     std::vector<sf::Sprite> carSprites;
     std::vector<std::string> carNames;
+    float rotationAngle;
     std::vector<int> maxSpeeds;
     std::vector<int> handlings;
     std::vector<int> accelerations;
