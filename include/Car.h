@@ -1,7 +1,8 @@
 //
-// Created by Voric on 11/08/2024.
+// Created by Voric and tobisdev on 11/08/2024.
 //
 
+#include <iostream>
 #include "SFML/Window/Keyboard.hpp"
 #include <vector>
 #include "SFML/Graphics/RectangleShape.hpp"
@@ -20,12 +21,22 @@ public:
     void render(sf::RenderWindow& window);
 
     sf::FloatRect getBounds() const;
-    void setTexture(const sf::Texture& texture);  // Add this method
+    void setTexture(const sf::Texture& texture);
 
 private:
     sf::Sprite carSprite;  // Change to sprite
-    float speed;
     sf::Vector2f direction;
+
+    float rotation_angle = 0.0f;
+    float angular_acceleration = 0.0f;
+    float angular_acceleration_constant = 1000.0f;
+
+    float acceleration = 0.0f;
+    float acceleration_constant = 11.0f;
+
+    float friction = 0.99f;
+
+    sf::Vector2f previous_position;
 };
 
 #endif //CAR_H

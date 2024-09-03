@@ -60,14 +60,8 @@ void CarChoosingState::handleInput(Game& game) {
                 selectCar(selectedCarIndex);
             }
             if (event.key.code == sf::Keyboard::Enter) {
-                static bool confirmPressed = false;
-                if (confirmPressed) {
-                    game.setSelectedCarTexture(carTextures[selectedCarIndex]);
-                    game.changeState(std::make_shared<MenuState>());
-                } else {
-                    confirmPressed = true;
-                    std::cout << "Press Enter again to confirm." << std::endl;
-                }
+                game.setSelectedCarTexture(carTextures[selectedCarIndex]);
+                game.changeState(std::make_shared<MenuState>());
             }
         }
     }

@@ -12,6 +12,9 @@ Game::Game() : window(sf::VideoMode(1920, 1080), "IntelliDrive", sf::Style::Full
 {
     car = std::make_shared<Car>();
     pushState(std::make_shared<MenuState>());
+
+    // apply default texture to car
+    selectedCarTexture.loadFromFile("resources/Car1.png");
 }
 Game::~Game() {
     std::cout << "Game is exiting..." << std::endl;
