@@ -24,7 +24,7 @@ public:
     void setTexture(const sf::Texture& texture);
 
 private:
-    sf::Sprite carSprite;  // Change to sprite
+    sf::Sprite carSprite;
     sf::Vector2f direction;
 
     float rotation_angle = 0.0f;

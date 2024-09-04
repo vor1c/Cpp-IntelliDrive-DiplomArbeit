@@ -25,13 +25,11 @@ private:
     void loadBackground();
     void changeBackground();
 
-    // Resources
     sf::Font Textfont;
     sf::Font Menufont;
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
 
-    // UI Elements
     sf::Text playButton;
     sf::Text systemButton;
     sf::Text carButton;
