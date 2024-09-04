@@ -18,24 +18,29 @@ public:
     CarChoosingState();
     void handleInput(Game& game);
     void update(Game& game);
+    void loadLogos();
+    void renderLogos(Game& game);
     void render(Game& game);
 
 private:
     void loadCars();
     void selectCar(int index);
-    void renderStatsBars(Game& game);
+    void renderBottomLine(Game& game);
 
     sf::Font font;
     sf::Font titlefont;
     sf::Text titleText;
     sf::Text carStatsText;
+    sf::Text statBarsLabel;
     sf::Text driveTypeText;
     sf::Vector2u defaultWindowSize;
     sf::RectangleShape dividerline;
     std::vector<sf::Texture> carTextures;
+    std::vector<sf::Texture> carLogos;
     std::vector<sf::Sprite> carSprites;
     std::vector<std::string> carNames;
     float rotationAngle;
+    float legendheight;
     std::vector<int> maxSpeeds;
     std::vector<int> handlings;
     std::vector<int> accelerations;
