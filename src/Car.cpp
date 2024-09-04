@@ -6,21 +6,11 @@
 
 // https://en.sfml-dev.org/forums/index.php?topic=7068.0
 
-Car::Car(){
-    carSprite.setPosition(400, 400);
-    previous_position = carSprite.getPosition();
-};
-
-void Car::setTexture(const sf::Texture& texture) {
-    carSprite.setTexture(texture);
-    carSprite.setOrigin(carSprite.getLocalBounds().width / 2, carSprite.getLocalBounds().height / 2);
-}
-
 void Car::handleInput() {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
         acceleration = acceleration_constant;
     }else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        acceleration = -acceleration_constant * 0.5f;
+        acceleration = -acceleration_constant;
     }else{
         acceleration = 0.0f;
     }
@@ -65,4 +55,11 @@ void Car::render(sf::RenderWindow& window) {
 
 sf::FloatRect Car::getBounds() const {
     return carSprite.getGlobalBounds();
+}
+
+void Car::applyData(carData &data) {
+    carSprite.setTexture(data.texture);
+    carSprite.setOrigin(carSprite.getLocalBounds().width / 2, carSprite.getLocalBounds().height / 2);
+    carSprite.setPosition(400, 400);
+    previous_position = carSprite.getPosition();
 }

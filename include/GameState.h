@@ -1,5 +1,5 @@
 //
-// Created by Voric on 11/08/2024.
+// Created by Voric and tobisdev on 11/08/2024.
 //
 
 #ifndef GAMESTATE_H
@@ -11,13 +11,13 @@
 
 class GameState : public State {
 public:
-    GameState(Game& game);
+    GameState(Game& game) : car(game.getCar()) {};
     void handleInput(Game& game) override;
     void update(Game& game) override;
     void render(Game& game) override;
 
 private:
-    Car car;
+    Car &car;
 };
 
 #endif //GAMESTATE_H

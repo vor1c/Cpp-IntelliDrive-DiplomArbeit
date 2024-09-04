@@ -47,7 +47,7 @@ MenuState::MenuState()
     title.setPosition(defaultWindowSize.x / 2.0f, (defaultWindowSize.y / 4.0f + 100.f));
 
     copyrightText.setFont(Textfont);
-    copyrightText.setString("© 2024 Devrim Yildiz & Tobias Huber. IntelliDrive is not really a TradeMark of Voric Productions LLC");
+    copyrightText.setString("\u00A9 2024 Devrim Yildiz & Tobias Huber. IntelliDrive is not really a TradeMark of Voric Productions LLC");
     copyrightText.setCharacterSize(20);
     copyrightText.setFillColor(sf::Color::White);
     sf::FloatRect copyrightBounds = copyrightText.getLocalBounds();
