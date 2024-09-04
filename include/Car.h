@@ -2,26 +2,40 @@
 // Created by Voric and tobisdev on 11/08/2024.
 //
 
-#include <iostream>
-#include "SFML/Window/Keyboard.hpp"
 #include <vector>
+#include <cmath>
+#include "SFML/Window/Keyboard.hpp"
 #include "SFML/Graphics/RectangleShape.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
-#include <cmath>
 #include "SFML/Graphics/Sprite.hpp"
+#include "SFML/Graphics/Texture.hpp"
+
 #ifndef CAR_H
 #define CAR_H
 
+struct carData{
+    std::string name;
+    sf::Texture texture;
+    int maxSpeed;
+    int handling;
+    int acceleration;
+    int weight;
+    int power;
+    int torque;
+    std::string driveType;
+};
+
 class Car {
 public:
-    Car();
+    Car() = default;
 
     void handleInput();
     void update(float dt);
     void render(sf::RenderWindow& window);
 
     sf::FloatRect getBounds() const;
-    void setTexture(const sf::Texture& texture);
+
+    void applyData(carData &data);
 
 private:
     sf::Sprite carSprite;

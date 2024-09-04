@@ -1,5 +1,5 @@
 //
-// Created by Voric on 31/08/2024.
+// Created by Voric and tobisdev on 31/08/2024.
 //
 
 #include "../include/CarChooseState.h"
@@ -10,10 +10,7 @@
 #include <chrono>
 #include <thread>
 
-
-
 CarChoosingState::CarChoosingState() : selectedCarIndex(0) {
-
     defaultWindowSize = sf::Vector2u(1920, 1080);
 
 
@@ -25,7 +22,6 @@ CarChoosingState::CarChoosingState() : selectedCarIndex(0) {
     }
 
     loadBackground();
-    loadCars();
     loadLogos();
 
     dividerline.setSize(sf::Vector2f(1920.0f, 5.0f));
@@ -40,40 +36,15 @@ CarChoosingState::CarChoosingState() : selectedCarIndex(0) {
     titleText.setFillColor(sf::Color::White);
     titleText.setPosition(defaultWindowSize.x / 2.0f - (titleText.getLocalBounds().width / 2), 40);
 
+    driveTypeText.setFont(font);
+    driveTypeText.setCharacterSize(30);
+    driveTypeText.setFillColor(sf::Color::White);
+    driveTypeText.setPosition(1000, 900);
 
+    dividerline.setSize(sf::Vector2f(1920.0f, 5.0f));
+    dividerline.setFillColor(sf::Color(80,80,80));
+    dividerline.setPosition(0, 850);
 
-    selectCar(0);
-}
-
-void CarChoosingState::loadCars() {
-    if (carSprites.empty()) {
-        carTextures.reserve(5);
-        carNames = {"Diablo GT 1999", "E-Type 4.2 1967", "GT40 1968", "911 Carrera 2022", "P1 2015"};
-        maxSpeeds = {10, 5, 7, 6, 10};
-        handlings = {6, 9, 3, 7, 10};
-        accelerations = {4, 6, 10, 7, 10};
-        weights = {1460, 1310, 1205, 1650, 1520};
-        maxPowers = {575, 265, 500, 480, 916};
-        torques = {64.2, 38.7, 54.1, 54.0, 91.8};
-        driveTypes = {"2WD", "4WD", "4WD", "4WD", "2WD"};
-
-        for (int i = 1; i <= 5; ++i) {
-            sf::Texture texture;
-            if (texture.loadFromFile("resources/Car" + std::to_string(i) + ".png")) {
-                carTextures.push_back(texture);
-                sf::Sprite sprite;
-                sprite.setTexture(carTextures.back());
-                sprite.setOrigin(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
-                sprite.setScale(2.0f, 2.0f);
-                sprite.setPosition(defaultWindowSize.x / 2.0f , 600.0f);
-                sprite.setScale(3.3f, 3.3f);
-                carSprites.push_back(sprite);
-            } else {
-                std::cerr << "Failed to load car " << i << " texture!" << std::endl;
-                carTextures.emplace_back();
-            }
-        }
-    }
 }
 
 void CarChoosingState::handleInput(Game& game) {
@@ -83,16 +54,14 @@ void CarChoosingState::handleInput(Game& game) {
             game.window.close();
         }
         if (event.type == sf::Event::KeyPressed) {
-            if (event.key.code == sf::Keyboard::Left) {
-                selectedCarIndex = (selectedCarIndex - 1 + carSprites.size()) % carSprites.size();
-                selectCar(selectedCarIndex);
+            if (event.key.code == sf::Keyboard::Left || event.key.code == sf::Keyboard::A) {
+                selectedCarIndex = (selectedCarIndex - 1 + game.cars.size()) % game.cars.size();
             }
-            if (event.key.code == sf::Keyboard::Right) {
-                selectedCarIndex = (selectedCarIndex + 1) % carSprites.size();
-                selectCar(selectedCarIndex);
+            if (event.key.code == sf::Keyboard::Right || event.key.code == sf::Keyboard::D) {
+                selectedCarIndex = (selectedCarIndex + 1) % game.cars.size();
             }
             if (event.key.code == sf::Keyboard::Enter) {
-                game.setSelectedCarTexture(carTextures[selectedCarIndex]);
+                //game.setSelectedCarTexture(carTextures[selectedCarIndex]);
                 game.changeState(std::make_shared<MenuState>());
             }
         }
@@ -100,12 +69,16 @@ void CarChoosingState::handleInput(Game& game) {
 }
 // https://www.sfml-dev.org/tutorials/2.6/graphics-transform.php
 void CarChoosingState::update(Game& game) {
-    sf::Sprite &selectedCar = carSprites[selectedCarIndex];
-    rotationAngle += 0.02f;
+    selectedCar.setTexture(game.cars[selectedCarIndex].texture);
+    selectedCar.setColor(sf::Color::White);
+    rotationAngle += 0.01f;
     if (rotationAngle >= 360.0f) {
         rotationAngle = 0.0f;
     }
     selectedCar.setRotation(rotationAngle);
+    selectedCar.setOrigin(selectedCar.getLocalBounds().width / 2, selectedCar.getLocalBounds().height / 2);
+    selectedCar.setPosition(game.window.getSize().x / 2, game.window.getSize().y / 2);
+    selectedCar.setScale(3.3f, 3.3f);
 }
 
 void CarChoosingState::loadLogos() {
@@ -165,23 +138,27 @@ void CarChoosingState::loadBackground() {
 void CarChoosingState::render(Game& game) {
     game.window.draw(backgroundSprite);
     game.window.draw(titleText);
-    game.window.draw(carSprites[selectedCarIndex]);
-    game.window.draw(driveTypeText);
+    game.window.draw(selectedCar);
     renderLogos(game);
     game.window.draw(dividerline);
     renderBottomLine(game);
 }
 
-void CarChoosingState::selectCar(int index) {
-    for (size_t i = 0; i < carSprites.size(); ++i) {
-        carSprites[i].setColor(sf::Color::White);
-    }
-}
+void CarChoosingState::renderStatsBars(Game& game) {
+    float legendheight =  (dividerline.getGlobalBounds().height + dividerline.getPosition().y + 1080) / 2;
 
-void CarChoosingState::renderBottomLine(Game& game) {
+    carStatsText.setString(
+            game.cars[selectedCarIndex].name + "\n\n" +
+            "Weight: " + std::to_string(game.cars[selectedCarIndex].weight) + " kg\n" +
+            "Max Power: " + std::to_string(game.cars[selectedCarIndex].power) + " PS\n" +
+            "Max Torque: " + std::to_string(game.cars[selectedCarIndex].torque) + " kgm"
+    );
+    game.window.draw(carStatsText);
 
-    float leftbounds = 0.0f;
-    legendheight =  (dividerline.getGlobalBounds().height + dividerline.getPosition().y + 1080) / 2;
+    driveTypeText.setString(game.cars[selectedCarIndex].driveType + " " + std::to_string(game.cars[selectedCarIndex].power) + "ps");
+    game.window.draw(driveTypeText);
+
+    sf::Text statBarsLabel;
 
     statBarsLabel.setFont(font);
     statBarsLabel.setCharacterSize(25);
@@ -197,7 +174,7 @@ void CarChoosingState::renderBottomLine(Game& game) {
 
 
     statBarsLabel.setString("Max Speed");
-    float barWidth = 20.0f * maxSpeeds[selectedCarIndex];
+    float barWidth = 20.0f * game.cars[selectedCarIndex].maxSpeed;
     sf::RectangleShape speedBar(sf::Vector2f(barWidth, 20.0f));
     speedBar.setFillColor(sf::Color::Red);
     speedBar.setPosition(315.0f, legendheight - 60);
@@ -206,7 +183,7 @@ void CarChoosingState::renderBottomLine(Game& game) {
     game.window.draw(statBarsLabel);
 
     statBarsLabel.setString("Handling");
-    barWidth = 20.0f * handlings[selectedCarIndex];
+    barWidth = 20.0f * game.cars[selectedCarIndex].handling;
     sf::RectangleShape handlingBar(sf::Vector2f(barWidth, 20.0f));
     handlingBar.setFillColor(sf::Color::Red);
     handlingBar.setPosition(315.0f, legendheight - 10);
@@ -215,7 +192,7 @@ void CarChoosingState::renderBottomLine(Game& game) {
     game.window.draw(statBarsLabel);
 
     statBarsLabel.setString("Acceleration");
-    barWidth = 20.0f * accelerations[selectedCarIndex];
+    barWidth = 20.0f * game.cars[selectedCarIndex].acceleration;
     sf::RectangleShape accelerationBar(sf::Vector2f(barWidth, 20.0f));
     accelerationBar.setFillColor(sf::Color::Red);
     accelerationBar.setPosition(315.0f, legendheight + 40);

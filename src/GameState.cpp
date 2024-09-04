@@ -1,5 +1,5 @@
 //
-// Created by Voric on 11/08/2024.
+// Created by Voric and tobisdev on 11/08/2024.
 //
 
 #include "../include/GameState.h"
@@ -7,10 +7,6 @@
 #include "../include/DeathState.h"
 #include "../include/Car.h"
 #include "../include/Game.h"
-
-GameState::GameState(Game& game) : car() {
-    car.setTexture(game.getSelectedCarTexture());
-}
 
 void GameState::handleInput(Game& game) {
     sf::Event event;
