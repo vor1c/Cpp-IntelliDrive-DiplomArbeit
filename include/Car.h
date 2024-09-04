@@ -38,7 +38,7 @@ public:
     void applyData(carData &data);
 
 private:
-    sf::Sprite carSprite;  // Change to sprite
+    sf::Sprite carSprite;
     sf::Vector2f direction;
 
     float rotation_angle = 0.0f;
