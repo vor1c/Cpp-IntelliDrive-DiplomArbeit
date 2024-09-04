@@ -24,6 +24,7 @@ CarChoosingState::CarChoosingState() : selectedCarIndex(0) {
         std::cerr << "Failed to load font!" << std::endl;
     }
 
+    loadBackground();
     loadCars();
     loadLogos();
 
@@ -153,9 +154,16 @@ void CarChoosingState::renderLogos(Game& game) {
     game.window.draw(carNameText);
 }
 
+void CarChoosingState::loadBackground() {
+    std::string backgroundImagePath = "resources/carchoosingstatebackground.png";
+    if (!backgroundTexture.loadFromFile(backgroundImagePath)) {
+        std::cerr << "Failed to load background image from path: " << backgroundImagePath << std::endl;
+    }
+    backgroundSprite.setTexture(backgroundTexture);
+}
 
 void CarChoosingState::render(Game& game) {
-    game.window.clear(sf::Color::Black);
+    game.window.draw(backgroundSprite);
     game.window.draw(titleText);
     game.window.draw(carSprites[selectedCarIndex]);
     game.window.draw(driveTypeText);
@@ -200,7 +208,7 @@ void CarChoosingState::renderBottomLine(Game& game) {
     statBarsLabel.setString("Handling");
     barWidth = 20.0f * handlings[selectedCarIndex];
     sf::RectangleShape handlingBar(sf::Vector2f(barWidth, 20.0f));
-    handlingBar.setFillColor(sf::Color::Yellow);
+    handlingBar.setFillColor(sf::Color::Red);
     handlingBar.setPosition(315.0f, legendheight - 10);
     statBarsLabel.setPosition(300.0f - statBarsLabel.getGlobalBounds().width, legendheight - 15);
     game.window.draw(handlingBar);
@@ -209,7 +217,7 @@ void CarChoosingState::renderBottomLine(Game& game) {
     statBarsLabel.setString("Acceleration");
     barWidth = 20.0f * accelerations[selectedCarIndex];
     sf::RectangleShape accelerationBar(sf::Vector2f(barWidth, 20.0f));
-    accelerationBar.setFillColor(sf::Color::Blue);
+    accelerationBar.setFillColor(sf::Color::Red);
     accelerationBar.setPosition(315.0f, legendheight + 40);
     statBarsLabel.setPosition(300.0f - statBarsLabel.getGlobalBounds().width, legendheight + 35);
     leftbounds = statBarsLabel.getPosition().x;

@@ -20,6 +20,7 @@ public:
     void update(Game& game);
     void loadLogos();
     void renderLogos(Game& game);
+    void loadBackground();
     void render(Game& game);
 
 private:
@@ -37,6 +38,8 @@ private:
     sf::RectangleShape dividerline;
     std::vector<sf::Texture> carTextures;
     std::vector<sf::Texture> carLogos;
+    sf::Texture backgroundTexture;
+    sf::Sprite backgroundSprite;
     std::vector<sf::Sprite> carSprites;
     std::vector<std::string> carNames;
     float rotationAngle;
