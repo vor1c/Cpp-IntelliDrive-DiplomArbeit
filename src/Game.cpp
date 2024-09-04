@@ -85,28 +85,31 @@ void Game::loadCarData(std::string path) {
                             data.name = token;
                             break;
                         case 1:
-                            data.texture.loadFromFile(token);
+                            data.carTexture.loadFromFile(token);
                             break;
                         case 2:
-                            data.maxSpeed = std::stoi(token);
+                            data.maxSpeed = std::stof(token);
                             break;
                         case 3:
-                            data.handling = std::stoi(token);
+                            data.handling = std::stof(token);
                             break;
                         case 4:
-                            data.acceleration = std::stoi(token);
+                            data.acceleration = std::stof(token);
                             break;
                         case 5:
-                            data.weight = std::stoi(token);
+                            data.weight = std::stof(token);
                             break;
                         case 6:
-                            data.power = std::stoi(token);
+                            data.power = std::stof(token);
                             break;
                         case 7:
-                            data.torque = std::stoi(token);
+                            data.torque = std::stof(token);
                             break;
                         case 8:
                             data.driveType = token;
+                            break;
+                        case 9:
+                            data.logoTexture.loadFromFile(token);
                             break;
                     }
                 }

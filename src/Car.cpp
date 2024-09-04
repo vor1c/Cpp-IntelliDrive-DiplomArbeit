@@ -58,7 +58,7 @@ sf::FloatRect Car::getBounds() const {
 }
 
 void Car::applyData(carData &data) {
-    carSprite.setTexture(data.texture);
+    carSprite.setTexture(data.carTexture);
     carSprite.setOrigin(carSprite.getLocalBounds().width / 2, carSprite.getLocalBounds().height / 2);
     carSprite.setPosition(400, 400);
     previous_position = carSprite.getPosition();

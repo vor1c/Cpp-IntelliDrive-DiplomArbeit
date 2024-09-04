@@ -15,14 +15,15 @@
 
 struct carData{
     std::string name;
-    sf::Texture texture;
-    int maxSpeed;
-    int handling;
-    int acceleration;
-    int weight;
-    int power;
-    int torque;
+    sf::Texture carTexture;
+    float maxSpeed;
+    float handling;
+    float acceleration;
+    float weight;
+    float power;
+    float torque;
     std::string driveType;
+    sf::Texture logoTexture;
 };
 
 class Car {
