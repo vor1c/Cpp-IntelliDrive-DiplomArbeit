@@ -1,6 +1,6 @@
 Name,CarTexture,MaxSpeed,Handling,Acceleration,Weight,Power,Torque,DriverType,LogoTexture
-Lamborghini Diablo,resources/Car1.png,1,1,1,1,1,1,1,resources/lambologo.png
-Sus,resources/Car2.png,1,1,1,1,1,1,1,resources/lambologo.png
-OOOO,resources/Car3.png,1,1,1,1,1,1,1,resources/lambologo.png
-fifa,resources/Car4.png,1,1,1,1,1,1,1,resources/lambologo.png
-What color is ur bugatti,resources/Car5.png,1,1,1,1,1,1,1,resources/lambologo.png
+Diablo GT 1999,resources/Car1.png,10,6,4,1460,575,64.2,2WD,resources/lambologo.png
+E-Type 4.2 1967,resources/Car2.png,5,9,4,1310,265,38.7,4WD,resources/jaguarlogo.png
+GT40 1968,resources/Car3.png,7,3,10,1205,500,54.1,4WD,resources/fordlogo.png
+911 Carrera 2022,resources/Car4.png,6,7,7,1650,480,54.0,4WD,resources/porschelogo.png
+P1 2015,resources/Car5.png,10,10,10,1520,916,91.8,2WD,resources/mclarenlogo.png

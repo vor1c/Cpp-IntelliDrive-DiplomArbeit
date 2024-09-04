@@ -59,6 +59,7 @@ void CarChoosingState::handleInput(Game& game) {
             }
             if (event.key.code == sf::Keyboard::Enter) {
                 //game.setSelectedCarTexture(carTextures[selectedCarIndex]);
+
                 game.changeState(std::make_shared<MenuState>());
             }
         }
