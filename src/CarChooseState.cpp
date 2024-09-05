@@ -121,7 +121,7 @@ void CarChoosingState::render(Game& game) {
     game.window.draw(carSprites[selectedCarIndex]);
     renderLogos(game);
     game.window.draw(dividerline);
-    renderStatsBars(game);
+    renderBottomLine(game);
 }
 
 void CarChoosingState::renderBottomLine(Game& game) {
