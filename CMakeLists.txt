@@ -17,9 +17,9 @@ file(GLOB ALL_HEADER_FILES include/*.hpp)
 
 # Add the main executable target
 add_executable(${PROJECT_NAME} ${ALL_SOURCE_FILES} ${ALL_HEADER_FILES}
-        src/carChooseState.cpp
-        include/carChooseState.h
-        include/carChooseState.h)
+        src/CarChooseState.cpp
+        include/CarChooseState.h
+        include/CarChooseState.h)
 
 # Use C++17 standards
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
