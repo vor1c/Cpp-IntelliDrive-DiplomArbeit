@@ -22,8 +22,9 @@ public:
     void loadBackground();
     void render(Game& game);
 
+
 private:
-    void renderStatsBars(Game& game);
+    void renderBottomLine(Game& game);
 
     sf::Font font;
     sf::Font titlefont;

@@ -124,7 +124,7 @@ void CarChoosingState::render(Game& game) {
     renderStatsBars(game);
 }
 
-void CarChoosingState::renderStatsBars(Game& game) {
+void CarChoosingState::renderBottomLine(Game& game) {
     sf::Text statBarsLabel;
 
     statBarsLabel.setFont(font);
