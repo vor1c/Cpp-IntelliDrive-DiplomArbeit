@@ -33,7 +33,7 @@ void GameState::render(Game& game) {
     sf::RectangleShape road(sf::Vector2f(game.window.getSize().x - 20, game.window.getSize().y - 20));
     road.setPosition(10, 10);
 
-    road.setFillColor(sf::Color{ 0x808080 });
+    road.setFillColor(sf::Color{80,80,80 });
     game.window.draw(road);
 
     car.render(game.window);
