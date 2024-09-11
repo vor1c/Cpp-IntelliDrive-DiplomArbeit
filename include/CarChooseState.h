@@ -32,7 +32,7 @@ private:
     sf::Text carStatsText;
     sf::Text statBarsLabel;
     sf::Text driveTypeText;
-    std::vector<sf::Sprite> carSprites;
+    sf::Sprite carSprite;
     sf::Vector2u defaultWindowSize;
     sf::RectangleShape dividerline;
     sf::Texture backgroundTexture;

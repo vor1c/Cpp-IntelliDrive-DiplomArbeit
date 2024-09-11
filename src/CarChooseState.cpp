@@ -68,20 +68,18 @@ void CarChoosingState::handleInput(Game& game) {
 
 // https://www.sfml-dev.org/tutorials/2.6/graphics-transform.php
 void CarChoosingState::update(Game& game) {
-    for (int i = 0; i < game.cars.size(); ++i) {
-        carSprites.emplace_back();
-        carSprites[i].setTexture(game.cars[i].carTexture);
-        carSprites[i].setColor(sf::Color::White);
-        carSprites[i].setOrigin(carSprites[i].getLocalBounds().width / 2, carSprites[i].getLocalBounds().height / 2);
-        carSprites[i].setPosition(game.window.getSize().x / 2, game.window.getSize().y / 2);
-        carSprites[i].setScale(3.3f, 3.3f);
-    }
+     carSprite = {};
+     carSprite.setTexture(game.cars[selectedCarIndex].carTexture);
+     carSprite.setColor(sf::Color::White);
+     carSprite.setOrigin(carSprite.getLocalBounds().width / 2, carSprite.getLocalBounds().height / 2);
+     carSprite.setPosition(game.window.getSize().x / 2, game.window.getSize().y / 2);
+     carSprite.setScale(3.3f, 3.3f);
 
     rotationAngle += 0.01f;
     if (rotationAngle >= 360.0f) {
         rotationAngle = 0.0f;
     }
-    carSprites[selectedCarIndex].setRotation(rotationAngle);
+    carSprite.setRotation(rotationAngle);
 }
 
 void CarChoosingState::renderLogos(Game& game) {
@@ -90,8 +88,8 @@ void CarChoosingState::renderLogos(Game& game) {
 
     sprite.setTexture(game.cars[selectedCarIndex].logoTexture);
     sprite.setOrigin(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
-    sf::Vector2f carPosition = carSprites[selectedCarIndex].getPosition();
-    sprite.setPosition(carPosition.x + carSprites[selectedCarIndex].getLocalBounds().width / 2 - 200.0f, carPosition.y - 300.0f);
+    sf::Vector2f carPosition = carSprite.getPosition();
+    sprite.setPosition(carPosition.x + carSprite.getLocalBounds().width / 2 - 200.0f, carPosition.y - 300.0f);
     sprite.setScale(0.1f, 0.1f);
 
     carNameText.setFont(font);
@@ -118,7 +116,7 @@ void CarChoosingState::loadBackground() {
 void CarChoosingState::render(Game& game) {
     game.window.draw(backgroundSprite);
     game.window.draw(titleText);
-    game.window.draw(carSprites[selectedCarIndex]);
+    game.window.draw(carSprite);
     renderLogos(game);
     game.window.draw(dividerline);
     renderBottomLine(game);

@@ -38,13 +38,16 @@ public:
 
     void applyData(carData &data);
 
+    sf::Sprite &getCarSprite() { return carSprite; }
+    void setPreviousPosition(sf::Vector2f const &previousPosition) { previous_position = previousPosition; }
+
 private:
     sf::Sprite carSprite;
     sf::Vector2f direction;
 
     float rotation_angle = 0.0f;
     float angular_acceleration = 0.0f;
-    float angular_acceleration_constant = 1000.0f;
+    float angular_acceleration_constant = 0.5f;
 
     float acceleration = 0.0f;
     float acceleration_constant = 11.0f;

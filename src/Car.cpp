@@ -35,7 +35,7 @@ void Car::update(float dt) {
 
     float speed = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
 
-    rotation_angle += angular_acceleration * speed * dt;
+    rotation_angle += angular_acceleration * speed;
 
     if (rotation_angle >= 360.0f) {
         rotation_angle -= 360.0f;
@@ -58,8 +58,6 @@ sf::FloatRect Car::getBounds() const {
 }
 
 void Car::applyData(carData &data) {
+    carSprite = {};
     carSprite.setTexture(data.carTexture);
-    carSprite.setOrigin(carSprite.getLocalBounds().width / 2, carSprite.getLocalBounds().height / 2);
-    carSprite.setPosition(400, 400);
-    previous_position = carSprite.getPosition();
 }

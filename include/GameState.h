@@ -11,7 +11,12 @@
 
 class GameState : public State {
 public:
-    GameState(Game& game) : car(game.getCar()) {};
+    GameState(Game& game) : car(game.getCar()) {
+        sf::Sprite &carSprite = car.getCarSprite();
+        carSprite.setOrigin(carSprite.getLocalBounds().width / 2, carSprite.getLocalBounds().height / 2);
+        carSprite.setPosition(400, 400);
+        car.setPreviousPosition(carSprite.getPosition());
+    };
     void handleInput(Game& game) override;
     void update(Game& game) override;
     void render(Game& game) override;
