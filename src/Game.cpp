@@ -4,6 +4,7 @@
 
 #include "../include/Game.h"
 #include <iostream>
+#include <numeric>
 #include <../include/MenuState.h>
 #include <SFML/System/Clock.hpp>
 sf::Event event;
@@ -15,6 +16,27 @@ Game::Game() : window(sf::VideoMode(1920, 1080), "IntelliDrive", sf::Style::Full
     loadCarData("resources/cars.csv");
     car.applyData(cars[0]);
     pushState(std::make_shared<MenuState>());
+
+    // Load font for displaying FPS
+    if (!font.loadFromFile("resources/Rubik-Regular.ttf")) {
+        std::cerr << "Error loading font" << std::endl;
+    }
+
+    // Setup text objects
+    fpsText.setFont(font);
+    fpsText.setCharacterSize(24);
+    fpsText.setFillColor(sf::Color::White);
+    fpsText.setPosition(100.f, 100.f);
+
+    avgText.setFont(font);
+    avgText.setCharacterSize(24);
+    avgText.setFillColor(sf::Color::White);
+    avgText.setPosition(100.f, 140.f);
+
+    lowsText.setFont(font);
+    lowsText.setCharacterSize(24);
+    lowsText.setFillColor(sf::Color::White);
+    lowsText.setPosition(100.f, 170.f);
 }
 Game::~Game() {
     std::cout << "Game is exiting..." << std::endl;
@@ -31,6 +53,7 @@ void Game::run() {
             currentState->update(*this);
             window.clear();
             currentState->render(*this);
+            calculateAndDisplayFPS();
             window.display();
         }
     }
@@ -120,4 +143,27 @@ void Game::loadCarData(std::string path) {
         row++;
     }
     inputFile.close();
+}
+
+void Game::calculateAndDisplayFPS() {
+    // Calculate average FPS
+    float sumFrameTimes = std::accumulate(frameTimes.begin(), frameTimes.end(), 0.0f);
+    float avgFrameTime = sumFrameTimes / frameTimes.size();
+    float avgFPS = 1.0f / avgFrameTime;
+
+    // Calculate 1% lows (the average of the slowest 1% of frames)
+    std::vector<float> sortedFrameTimes(frameTimes.begin(), frameTimes.end());
+    std::sort(sortedFrameTimes.begin(), sortedFrameTimes.end());
+    size_t onePercentIndex = static_cast<size_t>(sortedFrameTimes.size() * 0.01f);
+    float onePercentLowTime = std::accumulate(sortedFrameTimes.begin(), sortedFrameTimes.begin() + onePercentIndex, 0.0f) / onePercentIndex;
+    float onePercentLowsFPS = 1.0f / onePercentLowTime;
+
+    // Update the FPS text
+    fpsText.setString("FPS: " + std::to_string(static_cast<float>(1.0f / dt)));
+    avgText.setString("Avg FPS: " + std::to_string(static_cast<float>(avgFPS)));
+    lowsText.setString("1% Lows: " + std::to_string(static_cast<float>(onePercentLowsFPS)));
+    window.draw(fpsText);
+    window.draw(avgText);
+    window.draw(lowsText);
+
 }

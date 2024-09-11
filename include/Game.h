@@ -5,6 +5,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <deque>
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -23,7 +24,7 @@ public:
     void pushState(std::shared_ptr<State> state);
     void popState();
     void changeState(std::shared_ptr<State> state);
-
+    void calculateAndDisplayFPS();
     std::shared_ptr<State> getCurrentState();
 
     sf::RenderWindow window;
@@ -37,6 +38,10 @@ private:
     sf::Clock clock;
     Car car;
     std::vector<std::shared_ptr<State>> states;
+    std::deque<float> frameTimes;  // Store frame times
+    sf::Font font;
+    sf::Text fpsText, lowsText, avgText;
+    const int maxFrameSamples = 300;  // Store data for about 5 seconds at 60 FPS
 };
 
 #endif //GAME_H
