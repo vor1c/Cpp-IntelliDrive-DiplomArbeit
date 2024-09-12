@@ -5,7 +5,6 @@
 #include "../include/Game.h"
 #include <../include/MenuState.h>
 
-
 Game::Game() : window(sf::VideoMode(1920, 1080), "IntelliDrive", sf::Style::Fullscreen)
 {
     car = {};
@@ -47,7 +46,8 @@ void Game::popState() {
     states.pop_back();
 }
 
-void Game::changeState(std::shared_ptr<State> state) {
+void Game::changeState(std::shared_ptr<State> state){
+
     if (!states.empty()) {
         states.pop_back();
     }
@@ -97,7 +97,6 @@ void Game::calculateAndDisplayFPS() {
     window.draw(lowsText);
 }
 
-// Private helper methods
 void Game::initializeText(sf::Text& text, float x, float y) {
     if (!font.loadFromFile("resources/Rubik-Regular.ttf")) {
         std::cerr << "Error loading font" << std::endl;
