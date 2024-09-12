@@ -5,11 +5,8 @@
 #ifndef MENUSTATE_H
 #define MENUSTATE_H
 
-#include <SFML/Graphics.hpp>
-#include <memory>
-#include <string>
 #include "State.h"
-#include <iostream>
+#include "Game.h"
 
 class MenuState : public State {
 public:
@@ -20,25 +17,30 @@ public:
     void render(Game& game) override;
 
 private:
-    void updateButtonHover(sf::Text& button, const sf::Vector2i& mousePos);
+
     void initializeButton(sf::Text& button, const sf::Font& font, const std::string& text, const sf::Vector2u& windowSize, float offsetY);
+    void initializeText(sf::Text& textItem, const sf::Font& font, const std::string& text, unsigned int size, float x, float y);
+    bool loadFont(sf::Font& font, const std::string& fontPath);
     void loadBackground();
     void changeBackground();
+    void updateButtonHover(sf::Text& button, const sf::Vector2i& mousePos);
+    void handleMouseInput(Game& game);
+
 
     sf::Font Textfont;
     sf::Font Menufont;
-    sf::Texture backgroundTexture;
-    sf::Sprite backgroundSprite;
-
     sf::Text playButton;
     sf::Text systemButton;
     sf::Text carButton;
     sf::Text exitButton;
+    sf::Text changeBgButton;
     sf::Text title;
     sf::Text copyrightText;
     sf::Text versionText;
-    sf::Text changeBgButton;
 
+
+    sf::Texture backgroundTexture;
+    sf::Sprite backgroundSprite;
     int backgroundIndex;
 };
 
