@@ -26,13 +26,14 @@ void Car::handleInput() {
 
 void Car::update(float dt) {
     float radian_angle = rotation_angle * (3.14159265358979323846f / 180.0f);
-    sf::Vector2f forward_direction(std::sin(radian_angle), -std::cos(radian_angle));
-    sf::Vector2f velocity = (carSprite.getPosition() - previous_position) / dt; // Velocity = distance / time
-    velocity *= friction; // Apply friction to velocity
-    sf::Vector2f new_velocity = velocity + (forward_direction * acceleration * dt); // Add forward acceleration
 
-    sf::Vector2f newPosition = carSprite.getPosition() + new_velocity * dt;
-    float speed = std::sqrt(new_velocity.x * new_velocity.x + new_velocity.y * new_velocity.y);
+    sf::Vector2f forward_direction(std::sin(radian_angle), -std::cos(radian_angle));
+
+    sf:: Vector2f velocity = forward_direction * acceleration * dt;
+
+    sf::Vector2f newPosition = carSprite.getPosition() + velocity * dt;
+
+    float speed = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
 
     rotation_angle += angular_acceleration * speed * dt;
 
@@ -42,10 +43,9 @@ void Car::update(float dt) {
         rotation_angle += 360.0f;
     }
 
+    // Set the new rotation and position of the car sprite
     carSprite.setRotation(rotation_angle);
     carSprite.setPosition(newPosition);
-
-    previous_position = carSprite.getPosition();
 }
 
 void Car::render(sf::RenderWindow& window) {
