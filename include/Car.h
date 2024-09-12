@@ -39,7 +39,6 @@ public:
     void applyData(carData &data);
 
     sf::Sprite &getCarSprite() { return carSprite; }
-    void setPreviousPosition(sf::Vector2f const &previousPosition) { previous_position = previousPosition; }
 
 private:
     sf::Sprite carSprite;
@@ -53,8 +52,6 @@ private:
     float acceleration_constant = 5000000.0f;
 
     float friction = 0.1f;
-
-    sf::Vector2f previous_position;
 };
 
 #endif //CAR_H
