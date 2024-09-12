@@ -6,50 +6,56 @@
 #include "../include/GameState.h"
 #include "../include/MenuState.h"
 #include "../include/ResourceManager.h"
-//#include "../include/FileSystem.h"
 
 void DeathState::handleInput(Game& game) {
     sf::Event event;
     while (game.window.pollEvent(event)) {
-        if (event.type == sf::Event::Closed)
+        if (event.type == sf::Event::Closed) {
             game.window.close();
-
-        if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
+        }
+        if (isRestartKeyPressed(event)) {
             game.changeState(std::make_shared<GameState>(game));
         }
-
-        if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::M) {
+        if (isMenuKeyPressed(event)) {
             game.changeState(std::make_shared<MenuState>());
         }
     }
 }
 
-void DeathState::update(Game& game) {}
+void DeathState::update(Game& game) {
+    // leer
+}
 
 void DeathState::render(Game& game) {
-
-    std::string fontPath = "resources/Rubik-Regular.ttf";
-
-    if (!font.loadFromFile(fontPath)) {
-        std::cerr << "Failed to load font from path: " << fontPath << std::endl;
-        return;
-    }
-    deathText.setFont(font);
-    deathText.setString("You Crashed!");
-    deathText.setCharacterSize(40);
-    deathText.setPosition(300, 150);
-
-    playAgainButton.setFont(font);
-    playAgainButton.setString("Press R to Play Again");
-    playAgainButton.setCharacterSize(20);
-    playAgainButton.setPosition(250, 300);
-
-    menuButton.setFont(font);
-    menuButton.setString("Press M for Menu");
-    menuButton.setCharacterSize(20);
-    menuButton.setPosition(250, 350);
-
     game.window.draw(deathText);
     game.window.draw(playAgainButton);
     game.window.draw(menuButton);
 }
+
+bool DeathState::isRestartKeyPressed(const sf::Event& event) const {
+    return (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R);
+}
+
+bool DeathState::isMenuKeyPressed(const sf::Event& event) const {
+    return (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::M);
+}
+
+void DeathState::initializeText(sf::Text& text, const std::string& str, unsigned int size, float x, float y) {
+    text.setFont(font);
+    text.setString(str);
+    text.setCharacterSize(size);
+    text.setPosition(x, y);
+}
+
+DeathState::DeathState() {
+    std::string fontPath = "resources/Rubik-Regular.ttf";
+    if (!font.loadFromFile(fontPath)) {
+        std::cerr << "Failed to load font from path: " << fontPath << std::endl;
+        return;
+    }
+
+    initializeText(deathText, "You Crashed!", 40, 300.f, 150.f);
+    initializeText(playAgainButton, "Press R to Play Again", 20, 250.f, 300.f);
+    initializeText(menuButton, "Press M for Menu", 20, 250.f, 350.f);
+}
+
