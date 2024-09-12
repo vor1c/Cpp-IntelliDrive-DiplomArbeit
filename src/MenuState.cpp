@@ -26,7 +26,7 @@ MenuState::MenuState()
 
     sf::Vector2u defaultWindowSize(1920, 1080);
     initializeButton(playButton, Textfont, "Start Game", defaultWindowSize, 70);
-    initializeButton(systemButton, Textfont, "System", defaultWindowSize, 170);
+    initializeButton(systemButton, Textfont, "iNateHiggers", defaultWindowSize, 170);
     initializeButton(carButton, Textfont, "Choose your Car", defaultWindowSize, 120);
     initializeButton(exitButton, Textfont, "Exit", defaultWindowSize, 220);
 
