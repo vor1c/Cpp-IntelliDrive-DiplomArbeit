@@ -47,12 +47,12 @@ private:
 
     float rotation_angle = 0.0f;
     float angular_acceleration = 0.0f;
-    float angular_acceleration_constant = 0.5f;
+    float angular_acceleration_constant = 0.80f;
 
     float acceleration = 0.0f;
-    float acceleration_constant = 11.0f;
+    float acceleration_constant = 5000000.0f;
 
-    float friction = 0.99f;
+    float friction = 0.1f;
 
     sf::Vector2f previous_position;
 };
