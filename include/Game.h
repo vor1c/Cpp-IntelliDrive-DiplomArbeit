@@ -7,8 +7,9 @@
 
 #include <deque>
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <numeric>
+#include <sstream>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include "Car.h"
@@ -20,28 +21,39 @@ public:
     Game();
     ~Game();
     void run();
-    float dt;
+
     void pushState(std::shared_ptr<State> state);
     void popState();
     void changeState(std::shared_ptr<State> state);
-    void calculateAndDisplayFPS();
     std::shared_ptr<State> getCurrentState();
 
-    sf::RenderWindow window;
-
     void loadCarData(std::string path);
-    Car &getCar(){ return car; }
+    void calculateAndDisplayFPS();
 
+    Car& getCar() { return car; }
+
+    sf::RenderWindow window;
+    float dt;
     std::vector<carData> cars;
 
 private:
     sf::Clock clock;
     Car car;
+    sf::Event event;
     std::vector<std::shared_ptr<State>> states;
-    std::deque<float> frameTimes;  // Store frame times
+    std::deque<float> frameTimes;
+
+
     sf::Font font;
     sf::Text fpsText, lowsText, avgText;
-    const int maxFrameSamples = 300;  // Store data for about 5 seconds at 60 FPS
+
+    const int maxFrameSamples = 300;
+
+    void initializeText(sf::Text& text, float x, float y);
+    void parseCarDataLine(const std::string& line, carData& data);
+    float calculateAverageFPS() const;
+    float calculateOnePercentLowsFPS() const;
+    void updateText(sf::Text& text, const std::string& label, float value);
 };
 
-#endif //GAME_H
+#endif // GAME_H

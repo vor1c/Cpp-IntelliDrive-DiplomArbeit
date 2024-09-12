@@ -55,7 +55,7 @@ MenuState::MenuState()
     copyrightText.setPosition(defaultWindowSize.x / 2.0f, defaultWindowSize.y - 50);
 
     versionText.setFont(Textfont);
-    versionText.setString("Beta v1.5.1");
+    versionText.setString("Beta v1.5.2");
     versionText.setCharacterSize(20);
     versionText.setFillColor(sf::Color::White);
     versionText.setPosition(defaultWindowSize.x - 150, defaultWindowSize.y - 100);
