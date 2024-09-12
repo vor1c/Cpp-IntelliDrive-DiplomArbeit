@@ -5,24 +5,26 @@
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 
-#include "State.h"
-#include "Car.h"
-#include "Game.h"
+#include "../include/State.h"
+#include "../include/Car.h"
+#include "../include/Game.h"
 
 class GameState : public State {
 public:
     GameState(Game& game) : car(game.getCar()) {
-        sf::Sprite &carSprite = car.getCarSprite();
-        carSprite.setOrigin(carSprite.getLocalBounds().width / 2, carSprite.getLocalBounds().height / 2);
-        carSprite.setPosition(400, 400);
-        car.setPreviousPosition(carSprite.getPosition());
-    };
+        initializeCar();
+    }
+
     void handleInput(Game& game) override;
     void update(Game& game) override;
     void render(Game& game) override;
 
 private:
-    Car &car;
+    Car& car;
+
+    void initializeCar();
+    bool isPauseKeyPressed(const sf::Event& event) const;
+    sf::RectangleShape createRoad(Game& game) const;
 };
 
-#endif //GAMESTATE_H
+#endif // GAMESTATE_H
