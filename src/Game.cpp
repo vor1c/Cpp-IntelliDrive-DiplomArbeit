@@ -22,10 +22,13 @@ Game::~Game() {
 }
 
 void Game::run() {
-    sf::Clock clock;
+    auto previousTime = std::chrono::high_resolution_clock::now();  // Startzeitpunkt
+
     while (window.isOpen()) {
-        sf::Time deltaTime = clock.restart();
-        dt = deltaTime.asSeconds();
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        auto elapsedTime = std::chrono::duration_cast<std::chrono::nanoseconds>(currentTime - previousTime);
+        dt = elapsedTime.count() / 1e9;
+        previousTime = currentTime;
 
         if (auto currentState = getCurrentState()) {
             currentState->handleInput(*this);

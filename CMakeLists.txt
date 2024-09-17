@@ -43,6 +43,8 @@ file(MAKE_DIRECTORY ${RESOURCE_DIR})
 # Get all files in the resources directory
 file(GLOB RESOURCE_FILES ${PROJECT_SOURCE_DIR}/resources/*)
 
+# Link DLLs
+target_link_libraries(IntelliDrive -static)
 
 # Add custom command to copy resource files
 foreach(resource ${RESOURCE_FILES})
