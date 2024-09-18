@@ -3,6 +3,7 @@
 //
 
 #include "../include/Car.h"
+#include <iostream>
 
 // https://en.sfml-dev.org/forums/index.php?topic=7068.0
 
@@ -26,15 +27,16 @@ void Car::handleInput() {
 
 void Car::update(float dt) {
     float radian_angle = rotation_angle * (3.14159265358979323846f / 180.0f);
-    sf::Vector2f forward_direction(std::sin(radian_angle), -std::cos(radian_angle));
+    sf::Vector2<double> forward_direction(std::sin(radian_angle), -std::cos(radian_angle));
 
-    sf::Vector2f velocity = (carSprite.getPosition() - previous_position) * friction;
+    sf::Vector2<double> velocity = (current_position - previous_position) * friction;
 
-    sf::Vector2f newPosition = carSprite.getPosition() + (carSprite.getPosition() - previous_position + forward_direction * (acceleration * dt)) * friction;
+    std::cout << "Speed: " << (dt * 150.0f) << "\n";
+    sf::Vector2<double> newPosition = current_position + (current_position - previous_position) * friction /** (dt * 150.0f)*/ + forward_direction * (acceleration * dt);
 
     float speed = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
 
-    rotation_angle += angular_acceleration * speed * dt;
+    rotation_angle += angular_acceleration * speed;
 
     if (rotation_angle >= 360.0f) {
         rotation_angle -= 360.0f;
@@ -44,8 +46,9 @@ void Car::update(float dt) {
 
     carSprite.setRotation(rotation_angle);
 
-    previous_position = carSprite.getPosition();
-    carSprite.setPosition(newPosition);
+    previous_position = current_position;
+    current_position = newPosition;
+    carSprite.setPosition(newPosition.x, newPosition.y);
 }
 
 void Car::render(sf::RenderWindow& window) {

@@ -15,6 +15,8 @@ Game::Game() : window(sf::VideoMode(1920, 1080), "IntelliDrive", sf::Style::Full
     initializeText(fpsText, 100.f, 100.f);
     initializeText(avgText, 100.f, 140.f);
     initializeText(lowsText, 100.f, 170.f);
+
+    window.setFramerateLimit(144);
 }
 
 Game::~Game() {
@@ -29,6 +31,14 @@ void Game::run() {
         auto elapsedTime = std::chrono::duration_cast<std::chrono::nanoseconds>(currentTime - previousTime);
         dt = elapsedTime.count() / 1e9;
         previousTime = currentTime;
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::O)){
+            window.setFramerateLimit(144);
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)){
+            window.setFramerateLimit(10000);
+        }
 
         if (auto currentState = getCurrentState()) {
             currentState->handleInput(*this);

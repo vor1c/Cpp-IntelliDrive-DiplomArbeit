@@ -44,7 +44,6 @@ private:
     std::vector<std::shared_ptr<State>> states;
     std::deque<float> frameTimes;
 
-
     sf::Font font;
     sf::Text fpsText, lowsText, avgText;
 

@@ -1,5 +1,5 @@
 //
-// Created by Voric on 11/08/2024.
+// Created by Voric and Tobias on 11/08/2024.
 //
 
 #include "../include/MenuState.h"
@@ -20,9 +20,9 @@ MenuState::MenuState()
     loadBackground();
 
     sf::Vector2u defaultWindowSize(1920, 1080);
-    initializeButton(playButton, Textfont, "Start picking Cotton", defaultWindowSize, 70);
+    initializeButton(playButton, Textfont, "Start", defaultWindowSize, 70);
     initializeButton(carButton, Textfont, "Choose your Car", defaultWindowSize, 120);
-    initializeButton(systemButton, Textfont, "iNateHiggers", defaultWindowSize, 170);
+    initializeButton(systemButton, Textfont, "Settings", defaultWindowSize, 170);
     initializeButton(exitButton, Textfont, "Exit", defaultWindowSize, 220);
 
     initializeText(changeBgButton, Textfont, "Change Background", 30, 150, defaultWindowSize.y - 30);

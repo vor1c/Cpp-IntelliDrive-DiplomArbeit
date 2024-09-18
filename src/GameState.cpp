@@ -41,7 +41,8 @@ void GameState::initializeCar() {
     sf::Sprite &carSprite = car.getCarSprite();
     carSprite.setOrigin(carSprite.getLocalBounds().width / 2, carSprite.getLocalBounds().height / 2);
     carSprite.setPosition(400, 400);
-    car.setPreviousPosition(carSprite.getPosition());
+    car.setPreviousPosition({carSprite.getPosition().x, carSprite.getPosition().y});
+    car.setCurrentPosition({carSprite.getPosition().x, carSprite.getPosition().y});
 }
 
 bool GameState::isPauseKeyPressed(const sf::Event& event) const {
