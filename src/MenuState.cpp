@@ -22,8 +22,9 @@ MenuState::MenuState()
     sf::Vector2u defaultWindowSize(1920, 1080);
     initializeButton(playButton, Textfont, "Start", defaultWindowSize, 70);
     initializeButton(carButton, Textfont, "Choose your Car", defaultWindowSize, 120);
-    initializeButton(systemButton, Textfont, "Settings", defaultWindowSize, 170);
-    initializeButton(exitButton, Textfont, "Exit", defaultWindowSize, 220);
+    initializeButton(levelEditorButton, Textfont, "Level Editor", defaultWindowSize, 170); // Neue Schaltfläche
+    initializeButton(systemButton, Textfont, "Settings", defaultWindowSize, 220);
+    initializeButton(exitButton, Textfont, "Exit", defaultWindowSize, 270); // Aktualisiere Offset für Exit
 
     initializeText(changeBgButton, Textfont, "Change Background", 30, 150, defaultWindowSize.y - 30);
     initializeText(title, Menufont, "INTELLIDRIVE", 200, defaultWindowSize.x / 2.0f, defaultWindowSize.y / 4.0f + 100.f);
@@ -31,7 +32,7 @@ MenuState::MenuState()
     initializeText(copyrightText, Textfont,
                    "\u00A9 2024 Devrim Yildiz & Tobias Huber. IntelliDrive is not really a TradeMark of Voric Productions LLC",
                    20, defaultWindowSize.x / 2.0f, defaultWindowSize.y - 50);
-    initializeText(versionText, Textfont, "Beta v1.5.5", 20, defaultWindowSize.x - 150, defaultWindowSize.y - 100);
+    initializeText(versionText, Textfont, "Beta v1.6.0", 20, defaultWindowSize.x - 150, defaultWindowSize.y - 100);
 }
 
 void MenuState::handleInput(Game& game) {
@@ -53,6 +54,8 @@ void MenuState::handleMouseInput(Game& game) {
             game.changeState(std::make_shared<GameState>(game));
         } else if (carButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
             game.changeState(std::make_shared<CarChoosingState>());
+        } else if (levelEditorButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
+            game.changeState(std::make_shared<LevelCreator>(game)); // Wechsel zu LevelCreator
         } else if (exitButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
             game.window.close();
         } else if (changeBgButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
@@ -65,10 +68,10 @@ void MenuState::update(Game& game) {
     sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
 
     updateButtonHover(playButton, mousePos);
+    updateButtonHover(levelEditorButton, mousePos); // Button Hover-Update hinzufügen
     updateButtonHover(systemButton, mousePos);
     updateButtonHover(carButton, mousePos);
     updateButtonHover(exitButton, mousePos);
-    updateButtonHover(changeBgButton, mousePos);
 }
 
 void MenuState::render(Game& game) {
@@ -76,6 +79,7 @@ void MenuState::render(Game& game) {
     game.window.draw(backgroundSprite);
     game.window.draw(title);
     game.window.draw(playButton);
+    game.window.draw(levelEditorButton); // Level-Editor-Button rendern
     game.window.draw(systemButton);
     game.window.draw(carButton);
     game.window.draw(exitButton);
