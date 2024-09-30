@@ -5,10 +5,17 @@
 #ifndef CARCHOOSINGSTATE_H
 #define CARCHOOSINGSTATE_H
 
-#include <SFML/Graphics.hpp>
+#include <iostream>
+#include <chrono>
+#include <thread>
 #include <vector>
 #include <memory>
-#include <../include/State.h>
+#include <SFML/Graphics.hpp>
+#include "../include/MenuState.h"
+#include "../include/State.h"
+#include "../include/Game.h"
+#include "../include/GameState.h"
+
 
 class Game;
 class MenuState;

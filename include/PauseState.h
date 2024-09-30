@@ -5,8 +5,11 @@
 #ifndef PAUSESTATE_H
 #define PAUSESTATE_H
 
-#include "State.h"
-#include "Game.h"
+#include <iostream>
+#include "../include/State.h"
+#include "../include/Game.h"
+#include "../include/ResourceManager.h"
+#include "../include/MenuState.h"
 
 class PauseState : public State {
 public:

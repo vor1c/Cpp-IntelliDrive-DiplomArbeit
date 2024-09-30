@@ -7,6 +7,9 @@
 
 #include "../include/State.h"
 #include "../include/Game.h"
+#include "../include/GameState.h"
+#include "../include/MenuState.h"
+#include "../include/ResourceManager.h"
 
 class DeathState : public State {
 public:

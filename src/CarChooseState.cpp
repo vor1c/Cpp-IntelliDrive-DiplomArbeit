@@ -3,12 +3,6 @@
 //
 
 #include "../include/CarChooseState.h"
-#include "../include/Game.h"
-#include "../include/GameState.h"
-#include <iostream>
-#include <MenuState.h>
-#include <chrono>
-#include <thread>
 
 CarChoosingState::CarChoosingState() : selectedCarIndex(0) {
     defaultWindowSize = sf::Vector2u(1920, 1080);

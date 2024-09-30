@@ -3,10 +3,6 @@
 //
 
 #include "../include/GameState.h"
-#include "../include/PauseState.h"
-#include "../include/DeathState.h"
-#include "../include/Car.h"
-#include "../include/Game.h"
 
 void GameState::handleInput(Game& game) {
     sf::Event event;

@@ -4,12 +4,6 @@
 
 #include "../include/PauseState.h"
 
-#include <iostream>
-
-#include "../include/ResourceManager.h"
-#include "../include/MenuState.h"
-//#include "../include/FileSystem.h"
-
 void PauseState::handleInput(Game& game) {
     sf::Event event;
     while (game.window.pollEvent(event)) {

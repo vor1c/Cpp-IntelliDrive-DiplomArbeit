@@ -5,9 +5,11 @@
 #ifndef MENUSTATE_H
 #define MENUSTATE_H
 
-#include "State.h"
-#include "Game.h"
-
+#include "../include/State.h"
+#include "../include/Game.h"
+#include "../include/CarChooseState.h"
+#include "../include/GameState.h"
+#include "../include/ResourceManager.h"
 class MenuState : public State {
 public:
     MenuState();

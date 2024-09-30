@@ -3,9 +3,6 @@
 //
 
 #include "../include/MenuState.h"
-#include "CarChooseState.h"
-#include "../include/GameState.h"
-#include "../include/ResourceManager.h"
 
 MenuState::MenuState()
     : backgroundIndex(1) {
@@ -31,7 +28,7 @@ MenuState::MenuState()
     initializeText(copyrightText, Textfont,
                    "\u00A9 2024 Devrim Yildiz & Tobias Huber. IntelliDrive is not really a TradeMark of Voric Productions LLC",
                    20, defaultWindowSize.x / 2.0f, defaultWindowSize.y - 50);
-    initializeText(versionText, Textfont, "Beta v1.5.5", 20, defaultWindowSize.x - 150, defaultWindowSize.y - 100);
+    initializeText(versionText, Textfont, "(APA) Beta v1.6.0", 20, defaultWindowSize.x - 150, defaultWindowSize.y - 100);
 }
 
 void MenuState::handleInput(Game& game) {

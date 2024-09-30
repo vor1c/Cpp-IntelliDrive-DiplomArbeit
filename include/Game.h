@@ -12,10 +12,11 @@
 #include <sstream>
 #include <chrono>
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Clock.hpp>
-#include "Car.h"
-#include "SFML/Graphics/RenderWindow.hpp"
-#include "State.h"
+#include "../include/Car.h"
+#include "../include/State.h"
+#include "../include/MenuState.h"
 
 class Game {
 public:

@@ -3,7 +3,7 @@
 //
 
 #include "../include/Game.h"
-#include <../include/MenuState.h>
+#include "../include/MenuState.h"
 
 Game::Game() : window(sf::VideoMode(1920, 1080), "IntelliDrive", sf::Style::Fullscreen)
 {

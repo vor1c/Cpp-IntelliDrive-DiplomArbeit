@@ -3,9 +3,6 @@
 //
 
 #include "../include/DeathState.h"
-#include "../include/GameState.h"
-#include "../include/MenuState.h"
-#include "../include/ResourceManager.h"
 
 void DeathState::handleInput(Game& game) {
     sf::Event event;

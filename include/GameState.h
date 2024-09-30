@@ -8,6 +8,9 @@
 #include "../include/State.h"
 #include "../include/Car.h"
 #include "../include/Game.h"
+#include "../include/PauseState.h"
+#include "../include/DeathState.h"
+
 
 class GameState : public State {
 public:

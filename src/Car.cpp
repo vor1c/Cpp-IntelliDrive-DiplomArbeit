@@ -3,7 +3,6 @@
 //
 
 #include "../include/Car.h"
-#include <iostream>
 
 // https://en.sfml-dev.org/forums/index.php?topic=7068.0
 
