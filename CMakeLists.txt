@@ -20,10 +20,11 @@ add_executable(${PROJECT_NAME} ${ALL_SOURCE_FILES} ${ALL_HEADER_FILES}
         src/CarChooseState.cpp
         include/CarChooseState.h
         include/CarChooseState.h
-        src/LevelLoader.cpp
-        include/LevelLoader.h
         src/LevelCreator.cpp
-        include/LevelCreator.h)
+        include/LevelCreator.h
+        src/LevelSelectState.cpp
+        include/LevelSelectState.h
+        include/Wall.h)
 
 # Use C++17 standards
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)

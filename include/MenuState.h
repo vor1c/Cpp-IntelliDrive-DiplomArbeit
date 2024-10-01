@@ -7,7 +7,6 @@
 
 #include "State.h"
 #include "Game.h"
-#include "../include/LevelLoader.h"
 #include "../include/LevelCreator.h"
 
 class MenuState : public State {

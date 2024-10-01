@@ -4,6 +4,7 @@
 
 #include "../include/MenuState.h"
 #include "CarChooseState.h"
+#include "LevelSelectState.h"
 #include "../include/GameState.h"
 #include "../include/ResourceManager.h"
 
@@ -32,7 +33,7 @@ MenuState::MenuState()
     initializeText(copyrightText, Textfont,
                    "\u00A9 2024 Devrim Yildiz & Tobias Huber. IntelliDrive is not really a TradeMark of Voric Productions LLC",
                    20, defaultWindowSize.x / 2.0f, defaultWindowSize.y - 50);
-    initializeText(versionText, Textfont, "Beta v1.6.0", 20, defaultWindowSize.x - 150, defaultWindowSize.y - 100);
+    initializeText(versionText, Textfont, "Beta v1.6.1", 20, defaultWindowSize.x - 150, defaultWindowSize.y - 100);
 }
 
 void MenuState::handleInput(Game& game) {
@@ -51,7 +52,8 @@ void MenuState::handleMouseInput(Game& game) {
         sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
 
         if (playButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
-            game.changeState(std::make_shared<GameState>(game));
+         //   game.changeState(std::make_shared<GameState>(game));
+            game.changeState(std::make_shared<LevelSelectState>());
         } else if (carButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
             game.changeState(std::make_shared<CarChoosingState>());
         } else if (levelEditorButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
