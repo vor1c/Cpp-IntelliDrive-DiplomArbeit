@@ -32,6 +32,9 @@ public:
 
     void handleInput();
     void update(float dt);
+
+    void resetRotationAngle();
+
     void render(sf::RenderWindow& window);
 
     sf::FloatRect getBounds() const;

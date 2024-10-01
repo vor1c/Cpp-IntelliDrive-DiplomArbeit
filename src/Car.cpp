@@ -51,6 +51,10 @@ void Car::update(float dt) {
     carSprite.setPosition(newPosition.x, newPosition.y);
 }
 
+void Car::resetRotationAngle() {
+    rotation_angle = 0.0f;
+}
+
 void Car::render(sf::RenderWindow& window) {
     window.draw(carSprite);
 }
