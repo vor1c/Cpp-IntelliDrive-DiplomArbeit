@@ -32,6 +32,9 @@ public:
 
     void handleInput();
     void update(float dt);
+
+    void resetRotationAngle();
+
     void render(sf::RenderWindow& window);
 
     sf::FloatRect getBounds() const;
@@ -48,12 +51,12 @@ private:
 
     double rotation_angle = 0.0f;
     double angular_acceleration = 0.0f;
-    double angular_acceleration_constant = 0.9f;
+    double angular_acceleration_constant = 10.0f;
 
     double acceleration = 0.0f;
-    double acceleration_constant = 100.0f;
+    double acceleration_constant = 1000.0f;
 
-    double friction = 0.91f;
+    double friction = 1.01f;
 
     sf::Vector2<double> previous_position;
     sf::Vector2<double> current_position;

@@ -7,6 +7,7 @@
 
 #include "State.h"
 #include "Game.h"
+#include "../include/LevelCreator.h"
 
 class MenuState : public State {
 public:
@@ -34,6 +35,7 @@ private:
     sf::Text carButton;
     sf::Text exitButton;
     sf::Text changeBgButton;
+    sf::Text levelEditorButton;
     sf::Text title;
     sf::Text copyrightText;
     sf::Text versionText;

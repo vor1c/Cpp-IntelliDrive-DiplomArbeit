@@ -29,14 +29,17 @@ void Car::update(float dt) {
     float radian_angle = rotation_angle * (3.14159265358979323846f / 180.0f);
     sf::Vector2<double> forward_direction(std::sin(radian_angle), -std::cos(radian_angle));
 
-    sf::Vector2<double> velocity = (current_position - previous_position) * friction;
+    //std::cout << "Friction Value: " << std::pow(friction, dt * 1000.0f) << "/" << dt * 1000.0f  << "\n";
 
-    std::cout << "Speed: " << (dt * 150.0f) << "\n";
-    sf::Vector2<double> newPosition = current_position + (current_position - previous_position) * friction /** (dt * 150.0f)*/ + forward_direction * (acceleration * dt);
+// Fps-unabhängige Reibung anwenden
+    sf::Vector2<double> velocity = (current_position - previous_position) * std::pow(friction, dt * 1000.0f);
+
+    sf::Vector2<double> newPosition = current_position + velocity * (double)dt + forward_direction * (acceleration * dt);
 
     float speed = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
 
-    rotation_angle += angular_acceleration * speed;
+// FPS-unabhängige Winkelgeschwindigkeit
+    rotation_angle += angular_acceleration * speed * dt;
 
     if (rotation_angle >= 360.0f) {
         rotation_angle -= 360.0f;
@@ -49,6 +52,10 @@ void Car::update(float dt) {
     previous_position = current_position;
     current_position = newPosition;
     carSprite.setPosition(newPosition.x, newPosition.y);
+}
+
+void Car::resetRotationAngle() {
+    rotation_angle = 0.0f;
 }
 
 void Car::render(sf::RenderWindow& window) {
