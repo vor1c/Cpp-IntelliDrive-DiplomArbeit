@@ -19,3 +19,24 @@ void ResourceManager::loadFont(const std::string& name, const std::string& filen
 sf::Font& ResourceManager::getFont(const std::string& name) {
     return fonts.at(name);
 }
+
+std::vector<sf::Texture>
+ResourceManager::loadImagesInBulk(std::string path, std::string prefix, std::string postfix) {
+    std::vector<sf::Texture> textures;
+
+    sf::Texture texture;
+
+    int cnt = 01;
+
+    while (true){
+        std::string tilePath = path + prefix + (cnt < 10 ? "0" : "") + std::to_string(cnt) + postfix;
+        if (!texture.loadFromFile(tilePath)) {
+            break;
+        }else{
+            textures.emplace_back(texture);
+        }
+        cnt++;
+    }
+
+    return textures;
+}

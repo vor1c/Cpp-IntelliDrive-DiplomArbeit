@@ -27,8 +27,7 @@ void PauseState::handleInput(Game& game) {
 void PauseState::update(Game& game) {}
 
 void PauseState::render(Game& game) {
-    std::cout<<"PauseState 1" << std::endl;
-    std::string fontPath = "resources/Rubik-Regular.ttf";
+    std::string fontPath = "resources/Fonts/Rubik-Regular.ttf";
 
     if (!font.loadFromFile(fontPath)) {
         std::cerr << "Failed to load font from path: " << fontPath << std::endl;

@@ -111,7 +111,7 @@ void Game::calculateAndDisplayFPS() {
 }
 
 void Game::initializeText(sf::Text& text, float x, float y) {
-    if (!font.loadFromFile("resources/Rubik-Regular.ttf")) {
+    if (!font.loadFromFile("resources/Fonts/Rubik-Regular.ttf")) {
         std::cerr << "Error loading font" << std::endl;
     }
     text.setFont(font);

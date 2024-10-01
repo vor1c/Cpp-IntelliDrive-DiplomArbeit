@@ -13,10 +13,10 @@
 CarChoosingState::CarChoosingState() : selectedCarIndex(0) {
     defaultWindowSize = sf::Vector2u(1920, 1080);
 
-    if (!font.loadFromFile("resources/Rubik-Regular.ttf")) {
+    if (!font.loadFromFile("resources/Fonts/Rubik-Regular.ttf")) {
         std::cerr << "Failed to load font!" << std::endl;
     }
-    if (!titlefont.loadFromFile("resources/UpheavalPRO.ttf")) {
+    if (!titlefont.loadFromFile("resources/Fonts/UpheavalPRO.ttf")) {
         std::cerr << "Failed to load font!" << std::endl;
     }
 
@@ -106,7 +106,7 @@ void CarChoosingState::renderLogos(Game& game) {
 }
 
 void CarChoosingState::loadBackground() {
-    std::string backgroundImagePath = "resources/carchoosingstatebackground.png";
+    std::string backgroundImagePath = "resources/Backgrounds/carchoosingstatebackground.png";
     if (!backgroundTexture.loadFromFile(backgroundImagePath)) {
         std::cerr << "Failed to load background image from path: " << backgroundImagePath << std::endl;
     }

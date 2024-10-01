@@ -8,16 +8,19 @@
 #include <SFML/Graphics.hpp>
 #include <map>
 #include <string>
+#include <iostream>
 
 class ResourceManager {
 public:
+    ResourceManager() {}
     static ResourceManager& getInstance();
 
     void loadFont(const std::string& name, const std::string& filename);
     sf::Font& getFont(const std::string& name);
 
+    std::vector<sf::Texture> loadImagesInBulk(std::string path, std::string prefix, std::string postfix);
+
 private:
-    ResourceManager() {}
     std::map<std::string, sf::Font> fonts;
 };
 

@@ -13,6 +13,11 @@
 
 LevelCreator::LevelCreator(Game& game) {
     createSaveButton(game);
+
+    sf::Sprite s;
+    s.setTexture(tiles[0]);
+    placedTiles.emplace_back(s);
+    placedTiles[0].setScale(tileSize / placedTiles[0].getLocalBounds().height, tileSize / placedTiles[0].getLocalBounds().height);
 }
 
 void LevelCreator::createSaveButton(Game& game) {
@@ -20,7 +25,7 @@ void LevelCreator::createSaveButton(Game& game) {
     saveButton.setPosition(game.window.getSize().x - 120.0f, game.window.getSize().y - 40.0f);
     saveButton.setFillColor(sf::Color::Green);
 
-    if (!font.loadFromFile("resources/Rubik-Regular.ttf")) {
+    if (!font.loadFromFile("resources/Fonts/Rubik-Regular.ttf")) {
         std::cerr << "Error loading font" << std::endl;
     }
 
@@ -29,6 +34,10 @@ void LevelCreator::createSaveButton(Game& game) {
     buttonText.setCharacterSize(20);
     buttonText.setFillColor(sf::Color::White);
     buttonText.setPosition(saveButton.getPosition().x + 10.0f, saveButton.getPosition().y + 5.0f);
+
+    // Load tile textures
+    ResourceManager resourceManager;
+    tiles = resourceManager.loadImagesInBulk("resources/Tiles/Asphalt road/", "road_asphalt", ".png");
 }
 
 void LevelCreator::handleInput(Game& game) {
@@ -39,12 +48,27 @@ void LevelCreator::handleInput(Game& game) {
         }
 
         if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-            isDrawing = true;
-            wallPoints.push_back(static_cast<sf::Vector2f>(sf::Mouse::getPosition(game.window)));
+            mouseDown = true;
         }
 
         if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
-            isDrawing = false;
+            mouseDown = false;
+        }
+
+        if(mouseDown){
+            sf::Sprite s;
+            s.setTexture(tiles[0]);
+            s.setScale(tileSize / placedTiles[0].getLocalBounds().height, tileSize / placedTiles[0].getLocalBounds().height);
+            placedTiles.emplace_back(s);
+        }
+
+        if(event.type == sf::Event::KeyPressed){
+            if(event.key.code == sf::Keyboard::Key::Right || event.key.code == sf::Keyboard::Key::D){
+                selectedTile = (selectedTile + 1 < tiles.size()) ? selectedTile + 1 : 0;
+            }
+            if(event.key.code == sf::Keyboard::Key::Left || event.key.code == sf::Keyboard::Key::A){
+                selectedTile = (selectedTile - 1 < 0) ? tiles.size() - 1 : selectedTile - 1;
+            }
         }
 
         if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
@@ -88,6 +112,14 @@ void LevelCreator::update(Game& game) {
             wallPoints.push_back(currentMousePos);
         }
     }
+
+    sf::Vector2i mousePos = sf::Mouse::getPosition();
+
+    float snappedX = (int)(mousePos.x / tileSize) * tileSize;
+    float snappedY = (int)(mousePos.y / tileSize) * tileSize;
+
+    placedTiles[placedTiles.size() - 1].setPosition(snappedX, snappedY);
+    placedTiles[placedTiles.size() - 1].setTexture(tiles[selectedTile]);
 }
 
 void LevelCreator::render(Game& game) {
@@ -117,6 +149,11 @@ void LevelCreator::render(Game& game) {
         nameInputWindow.draw(inputText);
         nameInputWindow.display();
     }
+
+    for (int i = 0; i < placedTiles.size(); ++i) {
+        game.window.draw(placedTiles[i]);
+    }
+
 }
 
 void LevelCreator::saveWallToCSV(const std::string& filename) {

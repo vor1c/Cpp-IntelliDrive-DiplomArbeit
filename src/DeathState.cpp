@@ -48,7 +48,7 @@ void DeathState::initializeText(sf::Text& text, const std::string& str, unsigned
 }
 
 DeathState::DeathState() {
-    std::string fontPath = "resources/Rubik-Regular.ttf";
+    std::string fontPath = "resources/Fonts/Rubik-Regular.ttf";
     if (!font.loadFromFile(fontPath)) {
         std::cerr << "Failed to load font from path: " << fontPath << std::endl;
         return;

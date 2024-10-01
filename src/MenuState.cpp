@@ -11,8 +11,8 @@
 MenuState::MenuState()
     : backgroundIndex(1) {
 
-    std::string fontPath = "resources/Rubik-Regular.ttf";
-    std::string menuTitlePath = "resources/MenuTitle-Font.ttf";
+    std::string fontPath = "resources/Fonts/Rubik-Regular.ttf";
+    std::string menuTitlePath = "resources/Fonts/MenuTitle-Font.ttf";
 
     if (!loadFont(Textfont, fontPath) || !loadFont(Menufont, menuTitlePath)) {
         return;
@@ -112,7 +112,7 @@ bool MenuState::loadFont(sf::Font& font, const std::string& fontPath) {
 }
 
 void MenuState::loadBackground() {
-    std::string backgroundImagePath = "resources/background" + std::to_string(backgroundIndex) + ".png";
+    std::string backgroundImagePath = "resources/Backgrounds/background" + std::to_string(backgroundIndex) + ".png";
     if (!backgroundTexture.loadFromFile(backgroundImagePath)) {
         std::cerr << "Failed to load background image from path: " << backgroundImagePath << std::endl;
     }

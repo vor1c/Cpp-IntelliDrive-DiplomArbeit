@@ -7,7 +7,7 @@
 #include <filesystem>
 
 LevelSelectState::LevelSelectState() : currentPage(0) {
-    if (!font.loadFromFile("resources/Rubik-Regular.ttf")) {
+    if (!font.loadFromFile("resources/Fonts/Rubik-Regular.ttf")) {
         std::cerr << "Error loading font" << std::endl;
     }
     loadLevelFiles();
