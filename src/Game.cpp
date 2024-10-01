@@ -33,7 +33,7 @@ void Game::run() {
         previousTime = currentTime;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::O)){
-            window.setFramerateLimit(144);
+            window.setFramerateLimit(100);
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)){

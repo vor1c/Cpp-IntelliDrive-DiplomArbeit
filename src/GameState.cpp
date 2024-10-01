@@ -38,14 +38,23 @@ void GameState::loadLevelFromCSV(const std::string& filename) {
 
     while (std::getline(file, line)) {
         std::stringstream ss(line);
-        float x, y, width, height;
-        ss >> x >> y >> width >> height;
+        float x, y;
+        char comma;  // To store and ignore the comma
 
-        sf::RectangleShape wallSegment(sf::Vector2f(width, height));
+        // Extract x, the comma, and y
+        ss >> x >> comma >> y;
+
+        // Output the values for debugging
+        std::cout << "x: " << x << " y: " << y << "\n";
+
+        // Create a wall segment at the parsed x, y coordinates
+        sf::RectangleShape wallSegment(sf::Vector2f(10, 10));
         wallSegment.setPosition(sf::Vector2f(x, y));
 
+        // Add the wall segment to the wall collection
         walls.push_back(Wall(wallSegment));
     }
+
 }
 
 void GameState::update(Game& game) {
@@ -54,8 +63,12 @@ void GameState::update(Game& game) {
 
 void GameState::render(Game& game) {
     game.window.clear();
-    for (const auto& wall : walls) {
-        game.window.draw(wall);
+    for (int i = 1; i < walls.size(); ++i) {
+        sf::Vertex line[] = {
+                sf::Vertex(walls[i - 1].shape.getPosition(), sf::Color::Red),
+                sf::Vertex(walls[i].shape.getPosition(), sf::Color::Red)
+        };
+        game.window.draw(line, 2, sf::PrimitiveType::Lines);
     }
     car.render(game.window);
 }
