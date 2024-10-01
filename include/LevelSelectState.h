@@ -33,7 +33,7 @@ private:
     sf::RectangleShape nextPageButton, prevPageButton;
 
     void createLevelButtons();
-    void loadLevelPreview(const std::string& filename, sf::RectangleShape& preview);
+    void loadLevelPreview(Game &game, const std::string& filename, sf::RectangleShape& preview);
 };
 
 #endif
