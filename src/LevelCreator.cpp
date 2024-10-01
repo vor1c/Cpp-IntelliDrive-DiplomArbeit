@@ -17,7 +17,7 @@ LevelCreator::LevelCreator(Game& game) {
     sf::Sprite s;
     s.setTexture(tiles[0]);
     placedTiles.emplace_back(s);
-    placedTiles[0].setScale(tileSize / placedTiles[0].getLocalBounds().height, tileSize / placedTiles[0].getLocalBounds().height);
+    placedTiles[0].setScale(game.getTileSize() / placedTiles[0].getLocalBounds().height, game.getTileSize() / placedTiles[0].getLocalBounds().height);
 }
 
 void LevelCreator::createSaveButton(Game& game) {
@@ -58,7 +58,9 @@ void LevelCreator::handleInput(Game& game) {
         if(mouseDown){
             sf::Sprite s;
             s.setTexture(tiles[0]);
-            s.setScale(tileSize / placedTiles[0].getLocalBounds().height, tileSize / placedTiles[0].getLocalBounds().height);
+            s.setScale(game.getTileSize() / placedTiles[0].getLocalBounds().height, game.getTileSize() / placedTiles[0].getLocalBounds().height);
+
+            textureIDs.emplace_back(selectedTile);
             placedTiles.emplace_back(s);
         }
 
@@ -106,17 +108,10 @@ void LevelCreator::handleInput(Game& game) {
 }
 
 void LevelCreator::update(Game& game) {
-    if (isDrawing) {
-        sf::Vector2f currentMousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(game.window));
-        if (wallPoints.empty() || (currentMousePos != wallPoints.back())) {
-            wallPoints.push_back(currentMousePos);
-        }
-    }
-
     sf::Vector2i mousePos = sf::Mouse::getPosition();
 
-    float snappedX = (int)(mousePos.x / tileSize) * tileSize;
-    float snappedY = (int)(mousePos.y / tileSize) * tileSize;
+    float snappedX = (int)(mousePos.x / game.getTileSize()) * game.getTileSize();
+    float snappedY = (int)(mousePos.y / game.getTileSize()) * game.getTileSize();
 
     placedTiles[placedTiles.size() - 1].setPosition(snappedX, snappedY);
     placedTiles[placedTiles.size() - 1].setTexture(tiles[selectedTile]);
@@ -125,12 +120,8 @@ void LevelCreator::update(Game& game) {
 void LevelCreator::render(Game& game) {
     game.window.clear();
 
-    for (size_t i = 1; i < wallPoints.size(); ++i) {
-        sf::Vertex line[] = {
-            sf::Vertex(wallPoints[i - 1], sf::Color::Red),
-            sf::Vertex(wallPoints[i], sf::Color::Red)
-        };
-        game.window.draw(line, 2, sf::PrimitiveType::Lines);
+    for (int i = 0; i < placedTiles.size(); ++i) {
+        game.window.draw(placedTiles[i]);
     }
 
     game.window.draw(saveButton);
@@ -150,27 +141,26 @@ void LevelCreator::render(Game& game) {
         nameInputWindow.display();
     }
 
-    for (int i = 0; i < placedTiles.size(); ++i) {
-        game.window.draw(placedTiles[i]);
-    }
-
 }
 
 void LevelCreator::saveWallToCSV(const std::string& filename) {
+
     std::ofstream file("resources/" + filename);
     if (!file.is_open()) {
         std::cerr << "Error opening file to save" << std::endl;
         return;
     }
 
-    for (const auto& point : wallPoints) {
-        file << point.x << "," << point.y << std::endl;
+    for (int i = 0; i < placedTiles.size() - 1; ++i) {
+        file << (int)placedTiles[i].getPosition().x << "," << (int)placedTiles[i].getPosition().y << "," << (int)textureIDs[i] << std::endl;
     }
 
     file.close();
 }
 
 void LevelCreator::clearDrawing(Game &game) {
-    wallPoints.clear();
+    if(placedTiles.size() > 1){
+        placedTiles.erase(placedTiles.begin(), placedTiles.end() - 1);
+    }
     game.changeState(std::make_shared<MenuState>());
 }

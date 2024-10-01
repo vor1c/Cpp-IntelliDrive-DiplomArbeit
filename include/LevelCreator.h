@@ -25,19 +25,16 @@ public:
     void createSaveButton(Game& game);
 
 private:
-    std::vector<sf::Vector2f> wallPoints;
-    sf::RectangleShape currentWallSegment;
-    bool isDrawing = false;
     sf::RectangleShape saveButton;
     sf::Text buttonText;
     sf::Font font;
 
     std::vector<sf::Texture> tiles;
+
     std::vector<sf::Sprite> placedTiles;
+    std::vector<int> textureIDs;
 
     int selectedTile = 0;
-
-    float tileSize = 64;
 
     bool mouseDown = false;
 

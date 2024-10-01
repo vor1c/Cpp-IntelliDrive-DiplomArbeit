@@ -9,14 +9,14 @@
 #include "../include/Game.h"
 
 GameState::GameState(Game& game, const std::string& levelFile) : car(game.getCar()) {
-    loadLevelFromCSV(levelFile);
-    resetGameState(levelFile);
-}
-
-void GameState::resetGameState(const std::string& levelFile) {
-    walls.clear();
-    loadLevelFromCSV(levelFile);
     initializeCar();
+    placedTiles.clear();
+
+    // Load tile textures
+    ResourceManager resourceManager;
+    tiles = resourceManager.loadImagesInBulk("resources/Tiles/Asphalt road/", "road_asphalt", ".png");
+
+    loadLevelFromCSV(levelFile, game);
 }
 
 void GameState::handleInput(Game& game) {
@@ -32,27 +32,30 @@ void GameState::handleInput(Game& game) {
     car.handleInput();
 }
 
-void GameState::loadLevelFromCSV(const std::string& filename) {
+void GameState::loadLevelFromCSV(const std::string& filename, Game &game) {
     std::ifstream file(filename);
     std::string line;
 
     while (std::getline(file, line)) {
         std::stringstream ss(line);
         float x, y;
+        int texture;
         char comma;  // To store and ignore the comma
 
         // Extract x, the comma, and y
-        ss >> x >> comma >> y;
+        ss >> x >> comma >> y >> comma >> texture;
 
-        // Output the values for debugging
-        std::cout << "x: " << x << " y: " << y << "\n";
-
-        // Create a wall segment at the parsed x, y coordinates
-        sf::RectangleShape wallSegment(sf::Vector2f(10, 10));
-        wallSegment.setPosition(sf::Vector2f(x, y));
+        std::cout << "xxxx " << x << " " << y << " " <<texture << "\n";
 
         // Add the wall segment to the wall collection
-        walls.push_back(Wall(wallSegment));
+        sf::Sprite s;
+        s.setTexture(tiles[texture]);
+        s.setScale(game.getTileSize() / s.getLocalBounds().height, game.getTileSize() / s.getLocalBounds().height);
+        s.setPosition(x, y);
+        placedTiles.emplace_back(s);
+
+        std::cout << "HALLO!\n";
+
     }
 
 }
@@ -63,12 +66,8 @@ void GameState::update(Game& game) {
 
 void GameState::render(Game& game) {
     game.window.clear();
-    for (int i = 1; i < walls.size(); ++i) {
-        sf::Vertex line[] = {
-                sf::Vertex(walls[i - 1].shape.getPosition(), sf::Color::Red),
-                sf::Vertex(walls[i].shape.getPosition(), sf::Color::Red)
-        };
-        game.window.draw(line, 2, sf::PrimitiveType::Lines);
+    for (int i = 1; i < placedTiles.size(); ++i) {
+        game.window.draw(placedTiles[i]);
     }
     car.render(game.window);
 }
