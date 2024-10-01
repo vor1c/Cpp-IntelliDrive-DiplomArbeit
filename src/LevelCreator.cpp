@@ -8,10 +8,11 @@
 #include <SFML/Window.hpp>
 #include <fstream>
 #include <iostream>
+#include <MenuState.h>
 #include <string>
 
 LevelCreator::LevelCreator(Game& game) {
-    createSaveButton(game); // Create the Save button
+    createSaveButton(game);
 }
 
 void LevelCreator::createSaveButton(Game& game) {
@@ -19,7 +20,7 @@ void LevelCreator::createSaveButton(Game& game) {
     saveButton.setPosition(game.window.getSize().x - 120.0f, game.window.getSize().y - 40.0f);
     saveButton.setFillColor(sf::Color::Green);
 
-    if (!font.loadFromFile("resources/Rubik-Regular.ttf")) { // Load a font
+    if (!font.loadFromFile("resources/Rubik-Regular.ttf")) {
         std::cerr << "Error loading font" << std::endl;
     }
 
@@ -37,28 +38,23 @@ void LevelCreator::handleInput(Game& game) {
             game.window.close();
         }
 
-        // Start drawing on mouse press
         if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
             isDrawing = true;
             wallPoints.push_back(static_cast<sf::Vector2f>(sf::Mouse::getPosition(game.window)));
         }
 
-        // Stop drawing on mouse release
         if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
             isDrawing = false;
         }
 
-        // Check if the button was pressed
         if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
             if (saveButton.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y))) {
-                // Create a new window for entering the filename
                 nameInputWindow.create(sf::VideoMode(300, 100), "Enter filename", sf::Style::Close);
-                inputFileName.clear(); // Clear the filename for new input
+                inputFileName.clear();
             }
         }
     }
 
-    // Process input in the name input window
     if (nameInputWindow.isOpen()) {
         sf::Event nameEvent;
         while (nameInputWindow.pollEvent(nameEvent)) {
@@ -67,19 +63,18 @@ void LevelCreator::handleInput(Game& game) {
             }
 
             if (nameEvent.type == sf::Event::TextEntered) {
-                if (nameEvent.text.unicode < 128) { // Allow only ASCII characters
+                if (nameEvent.text.unicode < 128) {
                     if (nameEvent.text.unicode == '\b' && !inputFileName.empty()) {
-                        inputFileName.pop_back(); // Backspace
+                        inputFileName.pop_back();
                     } else if (nameEvent.text.unicode != '\b') {
-                        inputFileName += nameEvent.text.unicode; // Add character
+                        inputFileName += nameEvent.text.unicode;
                     }
                 }
             }
 
-            // Save and close the window
             if (nameEvent.type == sf::Event::KeyPressed && nameEvent.key.code == sf::Keyboard::Enter) {
                 saveWallToCSV(inputFileName + ".csv");
-                clearDrawing();
+                clearDrawing(game);
                 nameInputWindow.close();
             }
         }
@@ -88,10 +83,7 @@ void LevelCreator::handleInput(Game& game) {
 
 void LevelCreator::update(Game& game) {
     if (isDrawing) {
-        // Continuously add the current mouse position while drawing
         sf::Vector2f currentMousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(game.window));
-
-        // Only add the point if it's significantly different from the last point
         if (wallPoints.empty() || (currentMousePos != wallPoints.back())) {
             wallPoints.push_back(currentMousePos);
         }
@@ -101,7 +93,6 @@ void LevelCreator::update(Game& game) {
 void LevelCreator::render(Game& game) {
     game.window.clear();
 
-    // Draw wall segments
     for (size_t i = 1; i < wallPoints.size(); ++i) {
         sf::Vertex line[] = {
             sf::Vertex(wallPoints[i - 1], sf::Color::Red),
@@ -110,44 +101,39 @@ void LevelCreator::render(Game& game) {
         game.window.draw(line, 2, sf::PrimitiveType::Lines);
     }
 
-    // Draw the Save button
     game.window.draw(saveButton);
     game.window.draw(buttonText);
 
-    // Draw the input window
     if (nameInputWindow.isOpen()) {
-        nameInputWindow.clear(sf::Color::White); // Clear with a white background
+        nameInputWindow.clear(sf::Color::White);
 
-        // Create and configure the text to display the current input
         sf::Text inputText;
         inputText.setFont(font);
-        inputText.setString(inputFileName); // Show the current input
+        inputText.setString(inputFileName);
         inputText.setCharacterSize(20);
         inputText.setFillColor(sf::Color::Black);
-        inputText.setPosition(10.0f, 40.0f); // Position for the input text
+        inputText.setPosition(10.0f, 40.0f);
 
-        // Draw the input text on the input window
         nameInputWindow.draw(inputText);
-        nameInputWindow.display(); // Display the changes in the input window
+        nameInputWindow.display();
     }
-
 }
 
 void LevelCreator::saveWallToCSV(const std::string& filename) {
-    std::ofstream file("resources/" + filename); // Save in the resources folder
-
+    std::ofstream file("resources/" + filename);
     if (!file.is_open()) {
         std::cerr << "Error opening file to save" << std::endl;
         return;
     }
 
     for (const auto& point : wallPoints) {
-        file << point.x << "," << point.y << std::endl; // Save as CSV
+        file << point.x << "," << point.y << std::endl;
     }
 
     file.close();
 }
 
-void LevelCreator::clearDrawing() {
-    wallPoints.clear(); // Clear the drawn points
+void LevelCreator::clearDrawing(Game &game) {
+    wallPoints.clear();
+    game.changeState(std::make_shared<MenuState>());
 }

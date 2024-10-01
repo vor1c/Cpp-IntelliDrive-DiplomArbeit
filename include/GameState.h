@@ -17,7 +17,7 @@ public:
     }
 
     void handleInput(Game& game) override;
-
+    void resetGameState(const std::string& levelFile);
     void loadLevelFromCSV(const std::string &filename);
 
     void update(Game& game) override;

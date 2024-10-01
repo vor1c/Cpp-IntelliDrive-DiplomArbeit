@@ -17,23 +17,22 @@ public:
     void update(Game& game) override;
     void render(Game& game) override;
 
-    void saveWallToCSV(const std::string& filename);  // Speichern der Wanddaten in einer CSV
-    void clearDrawing(); // Löschen der gezeichneten Punkte
+    void saveWallToCSV(const std::string& filename);
+    void clearDrawing(Game &game);
     LevelCreator(Game &game);
 
-    void createSaveButton(Game& game); // Erstellen des Save-Buttons
+    void createSaveButton(Game& game);
 
 private:
-    std::vector<sf::Vector2f> wallPoints;  // Punkte der Wand, die mit der Maus gezeichnet werden
-    sf::RectangleShape currentWallSegment; // Aktuelles Wandsegment
-    bool isDrawing = false;                // Zeichnet der Spieler gerade?
-    sf::RectangleShape saveButton;         // Save-Button
-    sf::Text buttonText;                   // Text für den Save-Button
-    sf::Font font;                         // Schriftart für den Button
+    std::vector<sf::Vector2f> wallPoints;
+    sf::RectangleShape currentWallSegment;
+    bool isDrawing = false;
+    sf::RectangleShape saveButton;
+    sf::Text buttonText;
+    sf::Font font;
 
-    // Neues Fenster für die Dateinamen-Eingabe
     sf::RenderWindow nameInputWindow;
-    std::string inputFileName;             // Eingabewert für den Dateinamen
+    std::string inputFileName;
 };
 
 #endif // LEVELCREATOR_H

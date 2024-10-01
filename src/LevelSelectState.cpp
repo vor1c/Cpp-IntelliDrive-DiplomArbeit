@@ -1,6 +1,7 @@
 //
 // Created by Devrim on 30.09.2024.
 //
+
 #include "../include/LevelSelectState.h"
 #include "../include/GameState.h"
 #include <filesystem>
@@ -23,7 +24,6 @@ void LevelSelectState::loadLevelFiles() {
             }
         }
     }
-    // Calculate total pages
     totalPages = (levelFiles.size() + levelsPerPage - 1) / levelsPerPage;
 }
 
@@ -39,8 +39,7 @@ void LevelSelectState::handleInput(Game& game) {
         if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
             sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
 
-            // Check if a level button is pressed
-            for (int i = 0; i < 4; ++i) {
+            for (int i = 0; i < levelsPerPage; ++i) {
                 if (i + currentPage * levelsPerPage >= levelFiles.size()) break;
                 if (levelButtons[i].getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
                     std::string selectedLevel = "resources/" + levelFiles[i + currentPage * levelsPerPage];
@@ -48,16 +47,19 @@ void LevelSelectState::handleInput(Game& game) {
                 }
             }
 
-            // Navigation buttons
+
             if (nextPageButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
                 currentPage = (currentPage + 1) % totalPages;
+                createLevelButtons();
             }
             if (prevPageButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
                 currentPage = (currentPage - 1 + totalPages) % totalPages;
+                createLevelButtons();
             }
         }
     }
 }
+
 
 void LevelSelectState::update(Game& game) {
     sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
@@ -72,13 +74,11 @@ void LevelSelectState::update(Game& game) {
 void LevelSelectState::render(Game& game) {
     game.window.clear();
 
-    // Display level buttons
     for (int i = 0; i < 4; ++i) {
         if (i + currentPage * levelsPerPage >= levelFiles.size()) break;
         game.window.draw(levelButtons[i]);
         game.window.draw(levelTexts[i]);
 
-        // Create a small rectangle shape for the preview
         sf::RectangleShape preview(sf::Vector2f(50.0f, 50.0f));
         preview.setFillColor(sf::Color::Blue); // Set color to make it visible
         loadLevelPreview("resources/" + levelFiles[i + currentPage * levelsPerPage], preview);
@@ -86,7 +86,6 @@ void LevelSelectState::render(Game& game) {
         game.window.draw(preview);
     }
 
-    // Display navigation buttons
     game.window.draw(nextPageButton);
     game.window.draw(prevPageButton);
 }
@@ -100,17 +99,14 @@ void LevelSelectState::loadLevelPreview(const std::string& filename, sf::Rectang
         return;
     }
 
-    // Load only the first few lines for a small preview
     std::string line;
     int count = 0;
     while (std::getline(file, line) && count < 10) {
         std::stringstream ss(line);
         std::string xStr, yStr;
 
-        // Check if we can read two values
         if (std::getline(ss, xStr, ',') && std::getline(ss, yStr, ',')) {
             try {
-                // Check if the strings are valid numbers before converting
                 if (!xStr.empty() && !yStr.empty()) {
                     float x = std::stof(xStr);
                     float y = std::stof(yStr);
@@ -134,10 +130,13 @@ void LevelSelectState::loadLevelPreview(const std::string& filename, sf::Rectang
 
 
 void LevelSelectState::createLevelButtons() {
+    levelButtons.clear();
+    levelTexts.clear();
+
     float startX = 100.0f, startY = 150.0f;
     float offsetY = 100.0f;
 
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < levelsPerPage; ++i) {
         sf::RectangleShape button;
         button.setSize({400.0f, 50.0f});
         button.setPosition(startX, startY + i * offsetY);
@@ -145,11 +144,10 @@ void LevelSelectState::createLevelButtons() {
 
         sf::Text buttonText;
         buttonText.setFont(font);
-        buttonText.setColor(sf::Color::Black);
+        buttonText.setFillColor(sf::Color::Black);
         buttonText.setCharacterSize(20);
         buttonText.setPosition(startX + 10.0f, startY + i * offsetY + 10.0f);
 
-        // Set the text to the corresponding level file name
         if (i + currentPage * levelsPerPage < levelFiles.size()) {
             buttonText.setString(levelFiles[i + currentPage * levelsPerPage]);
         } else {
@@ -160,7 +158,7 @@ void LevelSelectState::createLevelButtons() {
         levelTexts.push_back(buttonText);
     }
 
-    // Next and previous page buttons
+
     nextPageButton.setSize({200.0f, 50.0f});
     nextPageButton.setPosition(700.0f, 600.0f);
     nextPageButton.setFillColor(sf::Color::Green);

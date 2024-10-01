@@ -10,34 +10,30 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
-#include <filesystem> // For reading file names
+#include <filesystem>
 
 class LevelSelectState : public State {
 public:
     LevelSelectState();
+    void loadLevelFiles();
+    void handleInput(Game& game) override;
+    void update(Game& game) override;
+    void render(Game& game) override;
 
-    void loadLevelFiles();  // Load all available level files
-    void handleInput(Game& game) override;  // Handle user input
-    void update(Game& game) override;  // Update the state
-    void render(Game& game) override;  // Render the level selection menu
+    std::vector<std::string> levelFiles;
 
 private:
-    std::vector<std::string> levelFiles;  // List of level file names
-    std::vector<sf::RectangleShape> levelButtons;  // Buttons for selecting levels
-    std::vector<sf::Text> levelTexts;  // Text for the level buttons
-    unsigned int currentPage;  // Keeps track of the current page
-    unsigned int totalPages;  // Total number of pages
-    const unsigned int levelsPerPage = 4;  // Levels displayed per page
+    std::vector<sf::RectangleShape> levelButtons;
+    std::vector<sf::Text> levelTexts;
+    unsigned int currentPage;
+    unsigned int totalPages;
+    const unsigned int levelsPerPage = 4;
 
     sf::Font font;
-    sf::RectangleShape nextPageButton, prevPageButton;  // Buttons to navigate pages
+    sf::RectangleShape nextPageButton, prevPageButton;
 
-    // Utility function to create the level selection buttons
     void createLevelButtons();
-
-    // Loads a small preview of the level based on the CSV file
     void loadLevelPreview(const std::string& filename, sf::RectangleShape& preview);
 };
 
 #endif
-

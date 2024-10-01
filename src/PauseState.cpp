@@ -3,9 +3,7 @@
 //
 
 #include "../include/PauseState.h"
-
 #include <iostream>
-
 #include "../include/ResourceManager.h"
 #include "../include/MenuState.h"
 //#include "../include/FileSystem.h"

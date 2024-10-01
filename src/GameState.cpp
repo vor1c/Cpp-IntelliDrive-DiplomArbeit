@@ -9,7 +9,14 @@
 #include "../include/Game.h"
 
 GameState::GameState(Game& game, const std::string& levelFile) : car(game.getCar()) {
-    loadLevelFromCSV(levelFile);  // Load level from CSV file
+    loadLevelFromCSV(levelFile);
+    resetGameState(levelFile);
+}
+
+void GameState::resetGameState(const std::string& levelFile) {
+    walls.clear();
+    loadLevelFromCSV(levelFile);
+    initializeCar();
 }
 
 void GameState::handleInput(Game& game) {
@@ -26,7 +33,6 @@ void GameState::handleInput(Game& game) {
 }
 
 void GameState::loadLevelFromCSV(const std::string& filename) {
-    // Assuming you are reading wall positions from the CSV
     std::ifstream file(filename);
     std::string line;
 
@@ -38,29 +44,20 @@ void GameState::loadLevelFromCSV(const std::string& filename) {
         sf::RectangleShape wallSegment(sf::Vector2f(width, height));
         wallSegment.setPosition(sf::Vector2f(x, y));
 
-        // Create a Wall object from the wallSegment and push it to walls
         walls.push_back(Wall(wallSegment));
     }
 }
 
-
 void GameState::update(Game& game) {
     car.update(game.dt);
-
-    // Collision Detection
-
-    // if (car.getBounds().left < 100 || car.getBounds().left + car.getBounds().width > 700) {
-    //     game.changeState(std::make_shared<DeathState>());
-    // }
 }
 
 void GameState::render(Game& game) {
     game.window.clear();
     for (const auto& wall : walls) {
-        game.window.draw(wall );
+        game.window.draw(wall);
     }
     car.render(game.window);
-
 }
 
 void GameState::initializeCar() {
