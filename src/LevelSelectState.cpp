@@ -7,9 +7,25 @@
 #include <filesystem>
 
 LevelSelectState::LevelSelectState() : currentPage(0) {
+    defaultWindowSize = sf::Vector2u(1920, 1080);
     if (!font.loadFromFile("resources/Fonts/Rubik-Regular.ttf")) {
         std::cerr << "Error loading font" << std::endl;
     }
+
+    if (!titlefont.loadFromFile("resources/Fonts/UpheavalPRO.ttf")) {
+        std::cerr << "Failed to load font!" << std::endl;
+    }
+
+    if (!backgroundTexture.loadFromFile("resources/backgrounds/carchoosingstatebackground.png")) {
+        std::cerr << "Error loading background texture" << std::endl;
+    }
+    backgroundSprite.setTexture(backgroundTexture);
+    titleText.setFont(titlefont);
+    titleText.setString("LEVEL SELECTION");
+    titleText.setCharacterSize(125);
+    titleText.setFillColor(sf::Color::White);
+    titleText.setPosition(defaultWindowSize.x / 2.0f - (titleText.getLocalBounds().width / 2), 40);
+
     loadLevelFiles();
     createLevelButtons();
 }
@@ -69,6 +85,8 @@ void LevelSelectState::update(Game& game) {
 
 void LevelSelectState::render(Game& game) {
     game.window.clear();
+    game.window.draw(backgroundSprite);
+    game.window.draw(titleText);
 
     float previewWidth = 640.0f / 2.0f;
     float previewHeight = 360.0f / 2.0f;

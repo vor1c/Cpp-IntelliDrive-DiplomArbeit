@@ -30,8 +30,13 @@ private:
     const unsigned int levelsPerPage = 4;
 
     sf::Font font;
+    sf::Vector2u defaultWindowSize;
+    sf::Font titlefont;
+    sf::Text titleText;
     sf::RectangleShape nextPageButton, prevPageButton;
     std::map<std::string, std::vector<sf::CircleShape>> cachedPreviews;
+    sf::Texture backgroundTexture;
+    sf::Sprite backgroundSprite;
 
     void createLevelButtons();
     void loadLevelPreview(Game &game, const std::string& filename, sf::RectangleShape& preview);
