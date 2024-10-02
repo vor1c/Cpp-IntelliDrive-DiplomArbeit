@@ -145,8 +145,13 @@ void LevelSelectState::loadLevelPreview(Game &game, const std::string& filename,
     float scaleX = previewWidth / levelWidth;
     float scaleY = previewHeight / levelHeight;
 
-    std::vector<sf::CircleShape> previewElements;
+    std::vector<sf::Sprite> previewElements;
 
+    // Use the ResourceManager to load images
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+    std::vector<sf::Texture> textures = resourceManager.loadImagesInBulk("resources/tiles/Asphalt road/", "road_asphalt", ".png");
+
+    int textureIndex = 0; // Assuming you want to use multiple textures
     while (std::getline(file, line)) {
         std::stringstream ss(line);
         std::string xStr, yStr;
@@ -157,21 +162,26 @@ void LevelSelectState::loadLevelPreview(Game &game, const std::string& filename,
                     float x = std::stof(xStr) * scaleX;
                     float y = std::stof(yStr) * scaleY;
 
-                    sf::CircleShape element(3.0f);
+                    sf::Sprite element;
+                    element.setTexture(textures[textureIndex % textures.size()]);
                     element.setPosition(preview.getPosition().x + x, preview.getPosition().y + y);
-                    element.setFillColor(sf::Color::Green);
 
                     previewElements.push_back(element);
                     game.window.draw(element);
+
+                    textureIndex++; // Move to the next texture
                 }
             } catch (const std::invalid_argument&) {
+                std::cerr << "Invalid coordinate data in preview" << std::endl;
             } catch (const std::out_of_range&) {
+                std::cerr << "Coordinate out of range in preview" << std::endl;
             }
         }
     }
     cachedPreviews[filename] = previewElements;
     file.close();
 }
+
 
 void LevelSelectState::createLevelButtons() {
     levelButtons.clear();

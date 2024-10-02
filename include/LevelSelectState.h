@@ -34,7 +34,7 @@ private:
     sf::Font titlefont;
     sf::Text titleText;
     sf::RectangleShape nextPageButton, prevPageButton;
-    std::map<std::string, std::vector<sf::CircleShape>> cachedPreviews;
+    std::map<std::string, std::vector<sf::Sprite>> cachedPreviews;
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
 
