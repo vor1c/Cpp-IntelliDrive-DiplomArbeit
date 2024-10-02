@@ -150,8 +150,11 @@ void LevelSelectState::loadLevelPreview(Game &game, const std::string& filename,
     // Use the ResourceManager to load images
     ResourceManager& resourceManager = ResourceManager::getInstance();
     std::vector<sf::Texture> textures = resourceManager.loadImagesInBulk("resources/tiles/Asphalt road/", "road_asphalt", ".png");
-
-    int textureIndex = 0; // Assuming you want to use multiple textures
+    if (textures.empty()) {
+        std::cerr << "Texture list is empty!" << std::endl;
+    }
+    int textureIndex;
+    textureIndex = textureIndex % textures.size(); // Assuming you want to use multiple textures
     while (std::getline(file, line)) {
         std::stringstream ss(line);
         std::string xStr, yStr;
@@ -178,6 +181,9 @@ void LevelSelectState::loadLevelPreview(Game &game, const std::string& filename,
             }
         }
     }
+    std::cerr << "Loading preview for: " << filename << std::endl;
+    std::cerr << "Texture index: " << textureIndex << " out of " << textures.size() << std::endl;
+
     cachedPreviews[filename] = previewElements;
     file.close();
 }
