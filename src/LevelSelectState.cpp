@@ -66,10 +66,12 @@ void LevelSelectState::update(Game& game) {
         }
     }
 }
+
 void LevelSelectState::render(Game& game) {
     game.window.clear();
 
-    float previewSize = 200.0f;
+    float previewWidth = 640.0f / 2.0f;
+    float previewHeight = 360.0f / 2.0f;
     float verticalSpacing = 30.0f;
 
     for (int i = 0; i < 4; ++i) {
@@ -78,25 +80,29 @@ void LevelSelectState::render(Game& game) {
         int row = i / 2;
         int col = i % 2;
 
-        // Vorschau für das Level
-        sf::RectangleShape preview(sf::Vector2f(previewSize, previewSize));
-        preview.setPosition(levelButtons[i].getPosition().x + (levelButtons[i].getSize().x - previewSize) / 2,
+        sf::RectangleShape preview(sf::Vector2f(previewWidth, previewHeight));
+        preview.setPosition(levelButtons[i].getPosition().x + (levelButtons[i].getSize().x - previewWidth) / 2,
                             levelButtons[i].getPosition().y + levelButtons[i].getSize().y + verticalSpacing);
 
-        // Zeichne Level-Buttons und Texte
         game.window.draw(levelButtons[i]);
         game.window.draw(levelTexts[i]);
-
-        // Lade und zeichne die Levelvorschau
-        loadLevelPreview(game,"resources/" + levelFiles[i + currentPage * levelsPerPage], preview);
-        game.window.draw(preview); // Vorschau zeichnen
+        game.window.draw(preview);
+        loadLevelPreview(game, "resources/" + levelFiles[i + currentPage * levelsPerPage], preview);
     }
 
     game.window.draw(nextPageButton);
     game.window.draw(prevPageButton);
 }
 
-void LevelSelectState::loadLevelPreview(Game &game,const std::string& filename, sf::RectangleShape& preview) {
+
+void LevelSelectState::loadLevelPreview(Game &game, const std::string& filename, sf::RectangleShape& preview) {
+    if (cachedPreviews.find(filename) != cachedPreviews.end()) {
+        for (const auto& element : cachedPreviews[filename]) {
+            game.window.draw(element);
+        }
+        return;
+    }
+
     std::ifstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Error opening level preview: " << filename << std::endl;
@@ -104,6 +110,15 @@ void LevelSelectState::loadLevelPreview(Game &game,const std::string& filename, 
     }
 
     std::string line;
+    float previewWidth = preview.getSize().x;
+    float previewHeight = preview.getSize().y;
+    float levelWidth = 1920.0f;
+    float levelHeight = 1080.0f;
+    float scaleX = previewWidth / levelWidth;
+    float scaleY = previewHeight / levelHeight;
+
+    std::vector<sf::CircleShape> previewElements;
+
     while (std::getline(file, line)) {
         std::stringstream ss(line);
         std::string xStr, yStr;
@@ -111,25 +126,25 @@ void LevelSelectState::loadLevelPreview(Game &game,const std::string& filename, 
         if (std::getline(ss, xStr, ',') && std::getline(ss, yStr, ',')) {
             try {
                 if (!xStr.empty() && !yStr.empty()) {
-                    float x = std::stof(xStr);
-                    float y = std::stof(yStr);
+                    float x = std::stof(xStr) * scaleX;
+                    float y = std::stof(yStr) * scaleY;
 
-                    // Zeichne die Level-Elemente an den entsprechenden Positionen
-                    sf::CircleShape element(10.0f); // Beispiel für einen Level-Element
-                    element.setPosition(x, y);
-                    element.setFillColor(sf::Color::Green); // Beispiel-Farbe
+                    sf::CircleShape element(3.0f);
+                    element.setPosition(preview.getPosition().x + x, preview.getPosition().y + y);
+                    element.setFillColor(sf::Color::Green);
 
-                    game.window.draw(element); // Level-Element zeichnen
+                    previewElements.push_back(element);
+                    game.window.draw(element);
                 }
             } catch (const std::invalid_argument&) {
-                // Fehler beim Konvertieren ignorieren
             } catch (const std::out_of_range&) {
-                // Fehler beim Konvertieren ignorieren
             }
         }
     }
+    cachedPreviews[filename] = previewElements;
     file.close();
 }
+
 
 
 void LevelSelectState::createLevelButtons() {
@@ -152,7 +167,7 @@ void LevelSelectState::createLevelButtons() {
         button.setSize({buttonWidth, buttonHeight});
         button.setPosition(col * (windowWidth / 2) + (windowWidth / 4) - (buttonWidth / 2),
                            verticalSpacing + row * (buttonHeight + previewSize + verticalSpacing));
-        button.setFillColor(sf::Color::White);
+        button.setFillColor(sf::Color::Red);
 
         sf::Text buttonText;
         buttonText.setFont(font);

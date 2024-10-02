@@ -31,6 +31,7 @@ private:
 
     sf::Font font;
     sf::RectangleShape nextPageButton, prevPageButton;
+    std::map<std::string, std::vector<sf::CircleShape>> cachedPreviews;
 
     void createLevelButtons();
     void loadLevelPreview(Game &game, const std::string& filename, sf::RectangleShape& preview);
