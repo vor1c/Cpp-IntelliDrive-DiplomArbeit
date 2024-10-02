@@ -38,6 +38,11 @@ private:
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
 
+    sf::Texture arrowLeftTexture;
+    sf::Texture arrowRightTexture;
+    sf::Sprite arrowLeftSprite;
+    sf::Sprite arrowRightSprite;
+
     void createLevelButtons();
     void loadLevelPreview(Game &game, const std::string& filename, sf::RectangleShape& preview);
 };

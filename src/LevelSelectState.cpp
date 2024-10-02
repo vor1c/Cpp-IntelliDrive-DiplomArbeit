@@ -1,7 +1,6 @@
 //
 // Created by Devrim on 30.09.2024.
 //
-
 #include "../include/LevelSelectState.h"
 #include "../include/GameState.h"
 #include <filesystem>
@@ -25,6 +24,18 @@ LevelSelectState::LevelSelectState() : currentPage(0) {
     titleText.setCharacterSize(125);
     titleText.setFillColor(sf::Color::White);
     titleText.setPosition(defaultWindowSize.x / 2.0f - (titleText.getLocalBounds().width / 2), 40);
+
+    // Load arrow textures
+    if (!arrowLeftTexture.loadFromFile("resources/GUI/arrowleft.png")) {
+        std::cerr << "Error loading left arrow texture" << std::endl;
+    }
+    if (!arrowRightTexture.loadFromFile("resources/GUI/arrowright.png")) {
+        std::cerr << "Error loading right arrow texture" << std::endl;
+    }
+
+    // Set up sprites for arrows
+    arrowLeftSprite.setTexture(arrowLeftTexture);
+    arrowRightSprite.setTexture(arrowRightTexture);
 
     loadLevelFiles();
     createLevelButtons();
@@ -61,11 +72,11 @@ void LevelSelectState::handleInput(Game& game) {
                 }
             }
 
-            if (nextPageButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
+            if (arrowRightSprite.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
                 currentPage = (currentPage + 1) % totalPages;
                 createLevelButtons();
             }
-            if (prevPageButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
+            if (arrowLeftSprite.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
                 currentPage = (currentPage - 1 + totalPages) % totalPages;
                 createLevelButtons();
             }
@@ -87,7 +98,6 @@ void LevelSelectState::render(Game& game) {
     game.window.clear();
     game.window.draw(backgroundSprite);
     game.window.draw(titleText);
-
     float previewWidth = 640.0f / 2.0f;
     float previewHeight = 360.0f / 2.0f;
     float verticalSpacing = 30.0f;
@@ -108,10 +118,10 @@ void LevelSelectState::render(Game& game) {
         loadLevelPreview(game, "resources/" + levelFiles[i + currentPage * levelsPerPage], preview);
     }
 
-    game.window.draw(nextPageButton);
-    game.window.draw(prevPageButton);
+    // Draw the arrow buttons instead of the previous and next buttons
+    game.window.draw(arrowRightSprite);
+    game.window.draw(arrowLeftSprite);
 }
-
 
 void LevelSelectState::loadLevelPreview(Game &game, const std::string& filename, sf::RectangleShape& preview) {
     if (cachedPreviews.find(filename) != cachedPreviews.end()) {
@@ -163,8 +173,6 @@ void LevelSelectState::loadLevelPreview(Game &game, const std::string& filename,
     file.close();
 }
 
-
-
 void LevelSelectState::createLevelButtons() {
     levelButtons.clear();
     levelTexts.clear();
@@ -203,11 +211,11 @@ void LevelSelectState::createLevelButtons() {
         levelTexts.push_back(buttonText);
     }
 
-    nextPageButton.setSize({200.0f, 50.0f});
-    nextPageButton.setPosition(windowWidth / 2 - nextPageButton.getSize().x / 2 - 100.0f, windowHeight - 100.0f);
-    nextPageButton.setFillColor(sf::Color::Red);
+    // Set positions for arrow buttons
+    float arrowScale = 0.5f; // Scale the arrows to the desired size
+    arrowLeftSprite.setScale(arrowScale, arrowScale);
+    arrowRightSprite.setScale(arrowScale, arrowScale);
 
-    prevPageButton.setSize({200.0f, 50.0f});
-    prevPageButton.setPosition(windowWidth / 2 - prevPageButton.getSize().x / 2 + 100.0f, windowHeight - 100.0f);
-    prevPageButton.setFillColor(sf::Color::Green);
+    arrowLeftSprite.setPosition(windowWidth / 2 - arrowLeftSprite.getGlobalBounds().width - 850.0f, windowHeight / 2 - arrowLeftSprite.getGlobalBounds().height / 2);
+    arrowRightSprite.setPosition(windowWidth / 2 + 850.0f, windowHeight / 2 - arrowRightSprite.getGlobalBounds().height / 2);
 }
