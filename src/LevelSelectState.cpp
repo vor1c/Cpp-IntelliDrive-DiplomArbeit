@@ -5,7 +5,15 @@
 #include "../include/GameState.h"
 #include <filesystem>
 
-LevelSelectState::LevelSelectState() : currentPage(0) {
+#include "../include/LevelSelectState.h"
+#include "../include/GameState.h"
+#include <filesystem>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+
+LevelSelectState::LevelSelectState() : currentPage(0), levelsPerPage(6) {
     defaultWindowSize = sf::Vector2u(1920, 1080);
     if (!font.loadFromFile("resources/Fonts/Rubik-Regular.ttf")) {
         std::cerr << "Error loading font" << std::endl;
@@ -64,6 +72,7 @@ void LevelSelectState::handleInput(Game& game) {
         if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
             sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
 
+            // Handle level selection
             for (int i = 0; i < levelsPerPage; ++i) {
                 if (i + currentPage * levelsPerPage >= levelFiles.size()) break;
                 if (levelButtons[i].getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
@@ -72,10 +81,13 @@ void LevelSelectState::handleInput(Game& game) {
                 }
             }
 
+            // Handle right arrow click (next page)
             if (arrowRightSprite.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
                 currentPage = (currentPage + 1) % totalPages;
                 createLevelButtons();
             }
+
+            // Handle left arrow click (previous page)
             if (arrowLeftSprite.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
                 currentPage = (currentPage - 1 + totalPages) % totalPages;
                 createLevelButtons();
@@ -89,7 +101,7 @@ void LevelSelectState::update(Game& game) {
     for (auto& button : levelButtons) {
         button.setFillColor(sf::Color::White);
         if (button.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
-            button.setFillColor(sf::Color(255, 215, 0));
+            button.setFillColor(sf::Color(255, 215, 0)); // Highlight button on hover
         }
     }
 }
@@ -98,11 +110,12 @@ void LevelSelectState::render(Game& game) {
     game.window.clear();
     game.window.draw(backgroundSprite);
     game.window.draw(titleText);
+
     float previewWidth = 640.0f / 2.0f;
     float previewHeight = 360.0f / 2.0f;
     float verticalSpacing = 30.0f;
 
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < levelsPerPage; ++i) {
         if (i + currentPage * levelsPerPage >= levelFiles.size()) break;
 
         int row = i / 2;
@@ -112,18 +125,25 @@ void LevelSelectState::render(Game& game) {
         preview.setPosition(levelButtons[i].getPosition().x + (levelButtons[i].getSize().x - previewWidth) / 2,
                             levelButtons[i].getPosition().y + levelButtons[i].getSize().y + verticalSpacing);
 
+        preview.setOutlineColor(sf::Color::White);
+        preview.setOutlineThickness(1.0f);
+        preview.setFillColor(sf::Color::Transparent);
+
         game.window.draw(levelButtons[i]);
         game.window.draw(levelTexts[i]);
-        game.window.draw(preview);
+
+        // Load and render preview elements
         loadLevelPreview(game, "resources/" + levelFiles[i + currentPage * levelsPerPage], preview);
+        game.window.draw(preview);
     }
 
-    // Draw the arrow buttons instead of the previous and next buttons
+    // Draw navigation arrows
     game.window.draw(arrowRightSprite);
     game.window.draw(arrowLeftSprite);
 }
 
 void LevelSelectState::loadLevelPreview(Game &game, const std::string& filename, sf::RectangleShape& preview) {
+    ResourceManager& resourceManager = ResourceManager::getInstance();
     if (cachedPreviews.find(filename) != cachedPreviews.end()) {
         for (const auto& element : cachedPreviews[filename]) {
             game.window.draw(element);
@@ -147,14 +167,16 @@ void LevelSelectState::loadLevelPreview(Game &game, const std::string& filename,
 
     std::vector<sf::Sprite> previewElements;
 
-    // Use the ResourceManager to load images
-    ResourceManager& resourceManager = ResourceManager::getInstance();
-    std::vector<sf::Texture> textures = resourceManager.loadImagesInBulk("resources/tiles/Asphalt road/", "road_asphalt", ".png");
+    // Use const reference to avoid the rvalue binding issue
+    const std::vector<sf::Texture>& textures = resourceManager.loadImagesInBulk("resources/tiles/Asphalt road/", "road_asphalt", ".png");
+
     if (textures.empty()) {
         std::cerr << "Texture list is empty!" << std::endl;
+        return;
     }
-    int textureIndex;
-    textureIndex = textureIndex % textures.size(); // Assuming you want to use multiple textures
+
+    int textureIndex = 0;
+
     while (std::getline(file, line)) {
         std::stringstream ss(line);
         std::string xStr, yStr;
@@ -170,9 +192,13 @@ void LevelSelectState::loadLevelPreview(Game &game, const std::string& filename,
                     element.setPosition(preview.getPosition().x + x, preview.getPosition().y + y);
 
                     previewElements.push_back(element);
-                    game.window.draw(element);
+                    textureIndex++;
 
-                    textureIndex++; // Move to the next texture
+                    // Limit the number of tiles in preview to prevent memory overload
+                    if (previewElements.size() > 10000) {
+                        std::cerr << "Too many tiles in the preview!" << std::endl;
+                        break;
+                    }
                 }
             } catch (const std::invalid_argument&) {
                 std::cerr << "Invalid coordinate data in preview" << std::endl;
@@ -181,11 +207,13 @@ void LevelSelectState::loadLevelPreview(Game &game, const std::string& filename,
             }
         }
     }
-    std::cerr << "Loading preview for: " << filename << std::endl;
-    std::cerr << "Texture index: " << textureIndex << " out of " << textures.size() << std::endl;
 
     cachedPreviews[filename] = previewElements;
     file.close();
+
+    for (const auto& element : previewElements) {
+        game.window.draw(element);
+    }
 }
 
 
@@ -228,7 +256,7 @@ void LevelSelectState::createLevelButtons() {
     }
 
     // Set positions for arrow buttons
-    float arrowScale = 0.5f; // Scale the arrows to the desired size
+    float arrowScale = 0.1f; // Scale the arrows to the desired size
     arrowLeftSprite.setScale(arrowScale, arrowScale);
     arrowRightSprite.setScale(arrowScale, arrowScale);
 

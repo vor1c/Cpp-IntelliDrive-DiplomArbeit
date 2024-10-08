@@ -20,6 +20,7 @@ public:
 
     std::vector<sf::Texture> loadImagesInBulk(std::string path, std::string prefix, std::string postfix);
 
+
 private:
     std::map<std::string, sf::Font> fonts;
 };
