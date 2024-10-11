@@ -1,4 +1,4 @@
-//
+ //
 // Created by Voric and tobisdev on 11/08/2024.
 //
 
@@ -12,9 +12,10 @@ GameState::GameState(Game& game, const std::string& levelFile) : car(game.getCar
     initializeCar();
     placedTiles.clear();
 
-    // Load tile textures
-    ResourceManager resourceManager;
-    tiles = resourceManager.loadImagesInBulk("resources/Tiles/Asphalt road/", "road_asphalt", ".png");
+
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+    resourceManager.loadTexturesInBulk("resources/Tiles/Asphalt road/", "road_asphalt", ".png");
+    tiles = resourceManager.getBulkTextures();
 
     loadLevelFromCSV(levelFile, game);
 }

@@ -35,9 +35,9 @@ void LevelCreator::createSaveButton(Game& game) {
     buttonText.setFillColor(sf::Color::White);
     buttonText.setPosition(saveButton.getPosition().x + 10.0f, saveButton.getPosition().y + 5.0f);
 
-    // Load tile textures
-    ResourceManager resourceManager;
-    tiles = resourceManager.loadImagesInBulk("resources/Tiles/Asphalt road/", "road_asphalt", ".png");
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+    resourceManager.loadTexturesInBulk("resources/Tiles/Asphalt road/", "road_asphalt", ".png");
+    tiles = resourceManager.getBulkTextures();
 }
 
 void LevelCreator::handleInput(Game& game) {

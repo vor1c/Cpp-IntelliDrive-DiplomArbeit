@@ -6,23 +6,31 @@
 #define RESOURCEMANAGER_H
 
 #include <SFML/Graphics.hpp>
-#include <map>
+#include <unordered_map>
 #include <string>
+#include <vector>
 #include <iostream>
 
 class ResourceManager {
 public:
-    ResourceManager() {}
     static ResourceManager& getInstance();
 
     void loadFont(const std::string& name, const std::string& filename);
     sf::Font& getFont(const std::string& name);
 
-    std::vector<sf::Texture> loadImagesInBulk(std::string path, std::string prefix, std::string postfix);
+    void loadTexture(const std::string& name, const std::string& filename);
+    sf::Texture& getTexture(const std::string& name);
 
+    void loadTexturesInBulk(const std::string& path, const std::string& prefix, const std::string& postfix);
+    const std::vector<sf::Texture>& getBulkTextures();
 
 private:
-    std::map<std::string, sf::Font> fonts;
+    ResourceManager() = default;
+
+    std::unordered_map<std::string, sf::Font> fonts;
+    std::unordered_map<std::string, sf::Texture> textures;
+
+    std::vector<sf::Texture> bulkTextures;
 };
 
-#endif //RESOURCEMANAGER_H
+#endif // RESOURCEMANAGER_H

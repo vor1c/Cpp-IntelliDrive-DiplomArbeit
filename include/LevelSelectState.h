@@ -30,6 +30,7 @@ private:
     const unsigned int levelsPerPage = 4;
 
     sf::Font font;
+    std::vector<sf::Texture> bulkTextures;
     sf::Vector2u defaultWindowSize;
     sf::Font titlefont;
     sf::Text titleText;

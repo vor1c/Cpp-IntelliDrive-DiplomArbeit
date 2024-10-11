@@ -1,47 +1,46 @@
 //
 // Created by Devrim on 30.09.2024.
 //
-#include "../include/LevelSelectState.h"
-#include "../include/GameState.h"
-#include <filesystem>
 
 #include "../include/LevelSelectState.h"
 #include "../include/GameState.h"
+#include "../include/ResourceManager.h"
 #include <filesystem>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
-
 LevelSelectState::LevelSelectState() : currentPage(0), levelsPerPage(6) {
     defaultWindowSize = sf::Vector2u(1920, 1080);
-    if (!font.loadFromFile("resources/Fonts/Rubik-Regular.ttf")) {
-        std::cerr << "Error loading font" << std::endl;
-    }
 
-    if (!titlefont.loadFromFile("resources/Fonts/UpheavalPRO.ttf")) {
-        std::cerr << "Failed to load font!" << std::endl;
-    }
+    // Load fonts using ResourceManager
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+    resourceManager.loadFont("Rubik-Regular", "resources/Fonts/Rubik-Regular.ttf");
+    resourceManager.loadFont("UpheavalPRO", "resources/Fonts/UpheavalPRO.ttf");
 
-    if (!backgroundTexture.loadFromFile("resources/backgrounds/carchoosingstatebackground.png")) {
-        std::cerr << "Error loading background texture" << std::endl;
-    }
+    // Retrieve fonts
+    font = resourceManager.getFont("Rubik-Regular");
+    titlefont = resourceManager.getFont("UpheavalPRO");
+
+    // Load background texture using ResourceManager
+    resourceManager.loadTexture("LevelSelectBackground", "resources/backgrounds/carchoosingstatebackground.png");
+    backgroundTexture = resourceManager.getTexture("LevelSelectBackground");
     backgroundSprite.setTexture(backgroundTexture);
+
+    // Set up title text
     titleText.setFont(titlefont);
     titleText.setString("LEVEL SELECTION");
     titleText.setCharacterSize(125);
     titleText.setFillColor(sf::Color::White);
     titleText.setPosition(defaultWindowSize.x / 2.0f - (titleText.getLocalBounds().width / 2), 40);
 
-    // Load arrow textures
-    if (!arrowLeftTexture.loadFromFile("resources/GUI/arrowleft.png")) {
-        std::cerr << "Error loading left arrow texture" << std::endl;
-    }
-    if (!arrowRightTexture.loadFromFile("resources/GUI/arrowright.png")) {
-        std::cerr << "Error loading right arrow texture" << std::endl;
-    }
+    // Load arrow textures using ResourceManager
+    resourceManager.loadTexture("ArrowLeft", "resources/GUI/arrowleft.png");
+    resourceManager.loadTexture("ArrowRight", "resources/GUI/arrowright.png");
 
     // Set up sprites for arrows
+    arrowLeftTexture = resourceManager.getTexture("ArrowLeft");
+    arrowRightTexture = resourceManager.getTexture("ArrowRight");
     arrowLeftSprite.setTexture(arrowLeftTexture);
     arrowRightSprite.setTexture(arrowRightTexture);
 
@@ -140,15 +139,27 @@ void LevelSelectState::render(Game& game) {
     // Draw navigation arrows
     game.window.draw(arrowRightSprite);
     game.window.draw(arrowLeftSprite);
+
 }
 
-void LevelSelectState::loadLevelPreview(Game &game, const std::string& filename, sf::RectangleShape& preview) {
+void LevelSelectState::loadLevelPreview(Game& game, const std::string& filename, sf::RectangleShape& preview) {
     ResourceManager& resourceManager = ResourceManager::getInstance();
+
     if (cachedPreviews.find(filename) != cachedPreviews.end()) {
         for (const auto& element : cachedPreviews[filename]) {
             game.window.draw(element);
         }
         return;
+    }
+
+    if (bulkTextures.empty()) {
+        resourceManager.loadTexturesInBulk("resources/tiles/Asphalt road/", "road_asphalt", ".png");
+        bulkTextures = resourceManager.getBulkTextures();
+
+        if (bulkTextures.empty()) {
+            std::cerr << "Failed to load bulk textures!" << std::endl;
+            return;
+        }
     }
 
     std::ifstream file(filename);
@@ -167,14 +178,6 @@ void LevelSelectState::loadLevelPreview(Game &game, const std::string& filename,
 
     std::vector<sf::Sprite> previewElements;
 
-    // Use const reference to avoid the rvalue binding issue
-    const std::vector<sf::Texture>& textures = resourceManager.loadImagesInBulk("resources/tiles/Asphalt road/", "road_asphalt", ".png");
-
-    if (textures.empty()) {
-        std::cerr << "Texture list is empty!" << std::endl;
-        return;
-    }
-
     int textureIndex = 0;
 
     while (std::getline(file, line)) {
@@ -188,13 +191,14 @@ void LevelSelectState::loadLevelPreview(Game &game, const std::string& filename,
                     float y = std::stof(yStr) * scaleY;
 
                     sf::Sprite element;
-                    element.setTexture(textures[textureIndex % textures.size()]);
+                    element.setTexture(bulkTextures[textureIndex % bulkTextures.size()]);
                     element.setPosition(preview.getPosition().x + x, preview.getPosition().y + y);
+                    element.setScale(scaleX, scaleY); // Scale the sprite to fit the preview
 
                     previewElements.push_back(element);
                     textureIndex++;
 
-                    // Limit the number of tiles in preview to prevent memory overload
+
                     if (previewElements.size() > 10000) {
                         std::cerr << "Too many tiles in the preview!" << std::endl;
                         break;
@@ -215,7 +219,6 @@ void LevelSelectState::loadLevelPreview(Game &game, const std::string& filename,
         game.window.draw(element);
     }
 }
-
 
 void LevelSelectState::createLevelButtons() {
     levelButtons.clear();
@@ -255,11 +258,11 @@ void LevelSelectState::createLevelButtons() {
         levelTexts.push_back(buttonText);
     }
 
-    // Set positions for arrow buttons
-    float arrowScale = 0.1f; // Scale the arrows to the desired size
+
+    float arrowScale = 0.1f;
     arrowLeftSprite.setScale(arrowScale, arrowScale);
     arrowRightSprite.setScale(arrowScale, arrowScale);
 
-    arrowLeftSprite.setPosition(windowWidth / 2 - arrowLeftSprite.getGlobalBounds().width - 850.0f, windowHeight / 2 - arrowLeftSprite.getGlobalBounds().height / 2);
-    arrowRightSprite.setPosition(windowWidth / 2 + 850.0f, windowHeight / 2 - arrowRightSprite.getGlobalBounds().height / 2);
+    arrowLeftSprite.setPosition(50.0f, windowHeight / 2 - arrowLeftSprite.getGlobalBounds().height / 2);
+    arrowRightSprite.setPosition(windowWidth - arrowRightSprite.getGlobalBounds().width - 50.0f, windowHeight / 2 - arrowRightSprite.getGlobalBounds().height / 2);
 }
