@@ -4,8 +4,27 @@
 
 #include "../include/Car.h"
 #include <iostream>
+#include <cmath>
 
+constexpr float PI = 3.14159265f;
 // https://en.sfml-dev.org/forums/index.php?topic=7068.0
+
+Car::Car()
+    : current_position(0.0f, 0.0f),
+      previous_position(0.0f, 0.0f),
+      velocity(0.0f, 0.0f),
+      rotation_angle(0.0f),
+      angular_velocity(0.0f),
+      acceleration(0.0f),
+      angular_acceleration(100.0f),
+      angular_damping(0.1f), // Similar to friction_coefficient but for rotation
+      friction(0.01f),
+      friction_coefficient(0.9f), // Adjust between 0 (no friction) and 1 (full stop instantly)
+      acceleration_constant(1000.0f),  // Units: pixels per second squared
+      angular_acceleration_constant(300.0f) // Units: degrees per second squared
+{
+
+}
 
 void Car::handleInput() {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
@@ -26,20 +45,21 @@ void Car::handleInput() {
 }
 
 void Car::update(float dt) {
-    float radian_angle = rotation_angle * (3.14159265358979323846f / 180.0f);
-    sf::Vector2<double> forward_direction(std::sin(radian_angle), -std::cos(radian_angle));
+    float radian_angle = rotation_angle * (PI / 180.0f);
 
-    //std::cout << "Friction Value: " << std::pow(friction, dt * 1000.0f) << "/" << dt * 1000.0f  << "\n";
+    sf::Vector2f forward_direction(sinf(radian_angle), -cosf(radian_angle));
 
-// Fps-unabhängige Reibung anwenden
-    sf::Vector2<double> velocity = (current_position - previous_position) * std::pow(friction, dt * 1000.0f);
+    velocity += forward_direction * acceleration * dt;
 
-    sf::Vector2<double> newPosition = current_position + velocity * (double)dt + forward_direction * (acceleration * dt);
+    velocity -= velocity * friction_coefficient * dt;
 
-    float speed = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
+    current_position += velocity * dt;
 
-// FPS-unabhängige Winkelgeschwindigkeit
-    rotation_angle += angular_acceleration * speed * dt;
+    angular_velocity += angular_acceleration * dt;
+
+    angular_velocity -= angular_velocity * angular_damping * dt;
+
+    rotation_angle += angular_velocity * dt;
 
     if (rotation_angle >= 360.0f) {
         rotation_angle -= 360.0f;
@@ -47,11 +67,10 @@ void Car::update(float dt) {
         rotation_angle += 360.0f;
     }
 
+    carSprite.setPosition(current_position);
     carSprite.setRotation(rotation_angle);
 
     previous_position = current_position;
-    current_position = newPosition;
-    carSprite.setPosition(newPosition.x, newPosition.y);
 }
 
 void Car::resetRotationAngle() {
