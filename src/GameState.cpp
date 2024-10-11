@@ -41,14 +41,12 @@ void GameState::loadLevelFromCSV(const std::string& filename, Game &game) {
         std::stringstream ss(line);
         float x, y;
         int texture;
-        char comma;  // To store and ignore the comma
+        char comma;
 
-        // Extract x, the comma, and y
         ss >> x >> comma >> y >> comma >> texture;
 
         std::cout << "xxxx " << x << " " << y << " " <<texture << "\n";
 
-        // Add the wall segment to the wall collection
         sf::Sprite s;
         s.setTexture(tiles[texture]);
         s.setScale(game.getTileSize() / s.getLocalBounds().height, game.getTileSize() / s.getLocalBounds().height);

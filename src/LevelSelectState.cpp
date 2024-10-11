@@ -13,32 +13,26 @@
 LevelSelectState::LevelSelectState() : currentPage(0), levelsPerPage(6) {
     defaultWindowSize = sf::Vector2u(1920, 1080);
 
-    // Load fonts using ResourceManager
     ResourceManager& resourceManager = ResourceManager::getInstance();
     resourceManager.loadFont("Rubik-Regular", "resources/Fonts/Rubik-Regular.ttf");
     resourceManager.loadFont("UpheavalPRO", "resources/Fonts/UpheavalPRO.ttf");
 
-    // Retrieve fonts
     font = resourceManager.getFont("Rubik-Regular");
     titlefont = resourceManager.getFont("UpheavalPRO");
 
-    // Load background texture using ResourceManager
     resourceManager.loadTexture("LevelSelectBackground", "resources/backgrounds/carchoosingstatebackground.png");
     backgroundTexture = resourceManager.getTexture("LevelSelectBackground");
     backgroundSprite.setTexture(backgroundTexture);
 
-    // Set up title text
     titleText.setFont(titlefont);
     titleText.setString("LEVEL SELECTION");
     titleText.setCharacterSize(125);
     titleText.setFillColor(sf::Color::White);
     titleText.setPosition(defaultWindowSize.x / 2.0f - (titleText.getLocalBounds().width / 2), 40);
 
-    // Load arrow textures using ResourceManager
     resourceManager.loadTexture("ArrowLeft", "resources/GUI/arrowleft.png");
     resourceManager.loadTexture("ArrowRight", "resources/GUI/arrowright.png");
 
-    // Set up sprites for arrows
     arrowLeftTexture = resourceManager.getTexture("ArrowLeft");
     arrowRightTexture = resourceManager.getTexture("ArrowRight");
     arrowLeftSprite.setTexture(arrowLeftTexture);

@@ -9,16 +9,18 @@
 #include <MenuState.h>
 #include <chrono>
 #include <thread>
+#include "../include/ResourceManager.h"
 
 CarChoosingState::CarChoosingState() : selectedCarIndex(0) {
     defaultWindowSize = sf::Vector2u(1920, 1080);
 
-    if (!font.loadFromFile("resources/Fonts/Rubik-Regular.ttf")) {
-        std::cerr << "Failed to load font!" << std::endl;
-    }
-    if (!titlefont.loadFromFile("resources/Fonts/UpheavalPRO.ttf")) {
-        std::cerr << "Failed to load font!" << std::endl;
-    }
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+
+    resourceManager.loadFont("Rubik-Regular", "resources/Fonts/Rubik-Regular.ttf");
+    resourceManager.loadFont("UpheavalPRO", "resources/Fonts/UpheavalPRO.ttf");
+
+    font = resourceManager.getFont("Rubik-Regular");
+    titlefont = resourceManager.getFont("UpheavalPRO");
 
     loadBackground();
 
@@ -58,7 +60,6 @@ void CarChoosingState::handleInput(Game& game) {
                 selectedCarIndex = (selectedCarIndex + 1) % game.cars.size();
             }
             if (event.key.code == sf::Keyboard::Enter) {
-                //game.setSelectedCarTexture(carTextures[selectedCarIndex]);
                 game.getCar().applyData(game.cars[selectedCarIndex]);
                 game.changeState(std::make_shared<MenuState>());
             }
@@ -66,7 +67,6 @@ void CarChoosingState::handleInput(Game& game) {
     }
 }
 
-// https://www.sfml-dev.org/tutorials/2.6/graphics-transform.php
 void CarChoosingState::update(Game& game) {
      carSprite = {};
      carSprite.setTexture(game.cars[selectedCarIndex].carTexture);
@@ -107,9 +107,11 @@ void CarChoosingState::renderLogos(Game& game) {
 
 void CarChoosingState::loadBackground() {
     std::string backgroundImagePath = "resources/Backgrounds/carchoosingstatebackground.png";
-    if (!backgroundTexture.loadFromFile(backgroundImagePath)) {
-        std::cerr << "Failed to load background image from path: " << backgroundImagePath << std::endl;
-    }
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+
+    resourceManager.loadTexture("CarChoosingBackground", backgroundImagePath);
+
+    backgroundTexture = resourceManager.getTexture("CarChoosingBackground");
     backgroundSprite.setTexture(backgroundTexture);
 }
 
@@ -136,7 +138,6 @@ void CarChoosingState::renderBottomLine(Game& game) {
     driveTypeText.setFont(font);
     driveTypeText.setCharacterSize(30);
     driveTypeText.setFillColor(sf::Color::White);
-
 
     statBarsLabel.setString("Max Speed");
     float barWidth = 20.0f * game.cars[selectedCarIndex].maxSpeed;
@@ -166,7 +167,6 @@ void CarChoosingState::renderBottomLine(Game& game) {
     game.window.draw(accelerationBar);
     game.window.draw(statBarsLabel);
 
-
     carStatsText.setString("Weight: " + std::to_string(game.cars[selectedCarIndex].weight) + " kg\n");
     carStatsText.setPosition(1920.0f - leftbounds - carStatsText.getGlobalBounds().width, legendheight - 65);
     game.window.draw(carStatsText);
@@ -179,10 +179,8 @@ void CarChoosingState::renderBottomLine(Game& game) {
     carStatsText.setPosition(1920.0f - leftbounds - carStatsText.getGlobalBounds().width, legendheight + 35);
     game.window.draw(carStatsText);
 
-
     driveTypeText.setPosition(800, legendheight - 15);
-    driveTypeText.setString(game.cars[selectedCarIndex].driveType + " " + std::to_string(game.cars[selectedCarIndex].power) + "ps");
+    driveTypeText.setString(game.cars[selectedCarIndex].driveType + " " + std::to_string(game.cars[selectedCarIndex].power) + " PS");
 
-    game.window.draw(carStatsText);
     game.window.draw(driveTypeText);
 }

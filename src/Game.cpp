@@ -3,7 +3,8 @@
 //
 
 #include "../include/Game.h"
-#include <../include/MenuState.h>
+#include "../include/MenuState.h"
+#include "../include/ResourceManager.h"
 
 Game::Game() : window(sf::VideoMode(1920, 1080), "IntelliDrive", sf::Style::Fullscreen)
 {
@@ -24,7 +25,7 @@ Game::~Game() {
 }
 
 void Game::run() {
-    auto previousTime = std::chrono::high_resolution_clock::now();  // Startzeitpunkt
+    auto previousTime = std::chrono::high_resolution_clock::now();
 
     while (window.isOpen()) {
         auto currentTime = std::chrono::high_resolution_clock::now();
@@ -81,10 +82,12 @@ void Game::loadCarData(std::string path) {
     std::string line;
     int row = 0;
 
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+
     while (getline(inputFile, line)) {
         if (row != 0) {
             carData data;
-            parseCarDataLine(line, data);
+            parseCarDataLine(line, data, resourceManager);
             cars.emplace_back(data);
         }
         row++;
@@ -111,16 +114,19 @@ void Game::calculateAndDisplayFPS() {
 }
 
 void Game::initializeText(sf::Text& text, float x, float y) {
-    if (!font.loadFromFile("resources/Fonts/Rubik-Regular.ttf")) {
-        std::cerr << "Error loading font" << std::endl;
-    }
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+
+    resourceManager.loadFont("Rubik-Regular", "resources/Fonts/Rubik-Regular.ttf");
+
+    font = resourceManager.getFont("Rubik-Regular");
+
     text.setFont(font);
     text.setCharacterSize(24);
     text.setFillColor(sf::Color::White);
     text.setPosition(x, y);
 }
 
-void Game::parseCarDataLine(const std::string& line, carData& data) {
+void Game::parseCarDataLine(const std::string& line, carData& data, ResourceManager& resourceManager) {
     std::stringstream ss(line);
     std::string token;
     int entry = 0;
@@ -128,16 +134,38 @@ void Game::parseCarDataLine(const std::string& line, carData& data) {
     while (getline(ss, token, ',')) {
         if (!token.empty()) {
             switch (entry) {
-                case 0: data.name = token; break;
-                case 1: data.carTexture.loadFromFile(token); break;
-                case 2: data.maxSpeed = std::stof(token); break;
-                case 3: data.handling = std::stof(token); break;
-                case 4: data.acceleration = std::stof(token); break;
-                case 5: data.weight = std::stof(token); break;
-                case 6: data.power = std::stof(token); break;
-                case 7: data.torque = std::stof(token); break;
-                case 8: data.driveType = token; break;
-                case 9: data.logoTexture.loadFromFile(token); break;
+            case 0:
+                data.name = token;
+                break;
+            case 1:
+                    resourceManager.loadTexture("CarTexture_" + data.name, token);
+                data.carTexture = resourceManager.getTexture("CarTexture_" + data.name);
+                break;
+            case 2:
+                data.maxSpeed = std::stof(token);
+                break;
+            case 3:
+                data.handling = std::stof(token);
+                break;
+            case 4:
+                data.acceleration = std::stof(token);
+                break;
+            case 5:
+                data.weight = std::stof(token);
+                break;
+            case 6:
+                data.power = std::stof(token);
+                break;
+            case 7:
+                data.torque = std::stof(token);
+                break;
+            case 8:
+                data.driveType = token;
+                break;
+            case 9:
+                    resourceManager.loadTexture("LogoTexture_" + data.name, token);
+                data.logoTexture = resourceManager.getTexture("LogoTexture_" + data.name);
+                break;
             }
         }
         entry++;

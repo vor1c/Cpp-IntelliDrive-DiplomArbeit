@@ -11,12 +11,16 @@
 MenuState::MenuState()
     : backgroundIndex(1) {
 
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+
     std::string fontPath = "resources/Fonts/Rubik-Regular.ttf";
     std::string menuTitlePath = "resources/Fonts/MenuTitle-Font.ttf";
 
-    if (!loadFont(Textfont, fontPath) || !loadFont(Menufont, menuTitlePath)) {
-        return;
-    }
+    resourceManager.loadFont("Rubik-Regular", fontPath);
+    resourceManager.loadFont("MenuTitle-Font", menuTitlePath);
+
+    Textfont = resourceManager.getFont("Rubik-Regular");
+    Menufont = resourceManager.getFont("MenuTitle-Font");
 
     loadBackground();
 
@@ -30,9 +34,6 @@ MenuState::MenuState()
     initializeText(changeBgButton, Textfont, "Change Background", 30, 150, defaultWindowSize.y - 30);
     initializeText(title, Menufont, "INTELLIDRIVE", 200, defaultWindowSize.x / 2.0f, defaultWindowSize.y / 4.0f + 100.f);
 
-    initializeText(copyrightText, Textfont,
-                   "\u00A9 2024 Devrim Yildiz & Tobias Huber. IntelliDrive is not really a TradeMark of Voric Productions LLC",
-                   20, defaultWindowSize.x / 2.0f, defaultWindowSize.y - 50);
     initializeText(versionText, Textfont, "Beta v1.6.8", 20, defaultWindowSize.x - 150, defaultWindowSize.y - 100);
 }
 
@@ -85,7 +86,6 @@ void MenuState::render(Game& game) {
     game.window.draw(carButton);
     game.window.draw(exitButton);
     game.window.draw(changeBgButton);
-    game.window.draw(copyrightText);
     game.window.draw(versionText);
 }
 
@@ -103,19 +103,14 @@ void MenuState::initializeText(sf::Text& textItem, const sf::Font& font, const s
     textItem.setPosition(x, y);
 }
 
-bool MenuState::loadFont(sf::Font& font, const std::string& fontPath) {
-    if (!font.loadFromFile(fontPath)) {
-        std::cerr << "Failed to load font from path: " << fontPath << std::endl;
-        return false;
-    }
-    return true;
-}
-
 void MenuState::loadBackground() {
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+
     std::string backgroundImagePath = "resources/Backgrounds/background" + std::to_string(backgroundIndex) + ".png";
-    if (!backgroundTexture.loadFromFile(backgroundImagePath)) {
-        std::cerr << "Failed to load background image from path: " << backgroundImagePath << std::endl;
-    }
+
+    resourceManager.loadTexture("MenuBackground_" + std::to_string(backgroundIndex), backgroundImagePath);
+
+    backgroundTexture = resourceManager.getTexture("MenuBackground_" + std::to_string(backgroundIndex));
     backgroundSprite.setTexture(backgroundTexture);
 }
 
