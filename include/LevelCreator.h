@@ -7,6 +7,7 @@
 
 #include "State.h"
 #include "Game.h"
+#include "ResourceManager.h"
 #include <vector>
 #include <fstream>
 #include <SFML/Graphics.hpp>
@@ -24,12 +25,18 @@ public:
     void createSaveButton(Game& game);
 
 private:
-    std::vector<sf::Vector2f> wallPoints;
-    sf::RectangleShape currentWallSegment;
-    bool isDrawing = false;
     sf::RectangleShape saveButton;
     sf::Text buttonText;
     sf::Font font;
+
+    std::vector<sf::Texture> tiles;
+
+    std::vector<sf::Sprite> placedTiles;
+    std::vector<int> textureIDs;
+
+    int selectedTile = 0;
+
+    bool mouseDown = false;
 
     sf::RenderWindow nameInputWindow;
     std::string inputFileName;

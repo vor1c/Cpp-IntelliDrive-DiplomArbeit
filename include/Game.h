@@ -16,6 +16,7 @@
 #include "Car.h"
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "State.h"
+#include "ResourceManager.h"
 
 class Game {
 public:
@@ -37,6 +38,8 @@ public:
     float dt;
     std::vector<carData> cars;
 
+    float getTileSize() {return this->tileSize;}
+
 private:
     sf::Clock clock;
     Car car;
@@ -44,13 +47,15 @@ private:
     std::vector<std::shared_ptr<State>> states;
     std::deque<float> frameTimes;
 
+    float tileSize = 64;
+
     sf::Font font;
     sf::Text fpsText, lowsText, avgText;
 
     const int maxFrameSamples = 300;
 
     void initializeText(sf::Text& text, float x, float y);
-    void parseCarDataLine(const std::string& line, carData& data);
+    void parseCarDataLine(const std::string& line, carData& data, ResourceManager& resourceManager);
     float calculateAverageFPS() const;
     float calculateOnePercentLowsFPS() const;
     void updateText(sf::Text& text, const std::string& label, float value);

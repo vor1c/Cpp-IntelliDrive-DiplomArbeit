@@ -4,25 +4,36 @@
 // LevelCreator.cpp
 
 #include "../include/LevelCreator.h"
+#include "../include/ResourceManager.h" // Include ResourceManager
+#include "../include/MenuState.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <fstream>
 #include <iostream>
-#include <MenuState.h>
 #include <string>
 
 LevelCreator::LevelCreator(Game& game) {
+
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+
+    resourceManager.loadTexturesInBulk("resources/Tiles/Asphalt road/", "road_asphalt", ".png");
+    tiles = resourceManager.getBulkTextures();
+
+    resourceManager.loadFont("Rubik-Regular", "resources/Fonts/Rubik-Regular.ttf");
+    font = resourceManager.getFont("Rubik-Regular");
+
     createSaveButton(game);
+
+    sf::Sprite s;
+    s.setTexture(tiles[0]);
+    s.setScale(game.getTileSize() / s.getLocalBounds().height, game.getTileSize() / s.getLocalBounds().height);
+    placedTiles.emplace_back(s);
 }
 
 void LevelCreator::createSaveButton(Game& game) {
     saveButton.setSize({100.0f, 30.0f});
     saveButton.setPosition(game.window.getSize().x - 120.0f, game.window.getSize().y - 40.0f);
     saveButton.setFillColor(sf::Color::Green);
-
-    if (!font.loadFromFile("resources/Rubik-Regular.ttf")) {
-        std::cerr << "Error loading font" << std::endl;
-    }
 
     buttonText.setFont(font);
     buttonText.setString("Save");
@@ -39,18 +50,33 @@ void LevelCreator::handleInput(Game& game) {
         }
 
         if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-            isDrawing = true;
-            wallPoints.push_back(static_cast<sf::Vector2f>(sf::Mouse::getPosition(game.window)));
-        }
-
-        if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
-            isDrawing = false;
-        }
-
-        if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+            mouseDown = true;
             if (saveButton.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y))) {
                 nameInputWindow.create(sf::VideoMode(300, 100), "Enter filename", sf::Style::Close);
                 inputFileName.clear();
+                mouseDown = false;
+            }
+        }
+
+        if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
+            mouseDown = false;
+        }
+
+        if (mouseDown) {
+            sf::Sprite s;
+            s.setTexture(tiles[selectedTile]);
+            s.setScale(game.getTileSize() / s.getLocalBounds().height, game.getTileSize() / s.getLocalBounds().height);
+
+            textureIDs.emplace_back(selectedTile);
+            placedTiles.emplace_back(s);
+        }
+
+        if (event.type == sf::Event::KeyPressed) {
+            if (event.key.code == sf::Keyboard::Key::Right || event.key.code == sf::Keyboard::Key::D) {
+                selectedTile = (selectedTile + 1) % tiles.size();
+            }
+            if (event.key.code == sf::Keyboard::Key::Left || event.key.code == sf::Keyboard::Key::A) {
+                selectedTile = (selectedTile == 0) ? tiles.size() - 1 : selectedTile - 1;
             }
         }
     }
@@ -67,7 +93,7 @@ void LevelCreator::handleInput(Game& game) {
                     if (nameEvent.text.unicode == '\b' && !inputFileName.empty()) {
                         inputFileName.pop_back();
                     } else if (nameEvent.text.unicode != '\b') {
-                        inputFileName += nameEvent.text.unicode;
+                        inputFileName += static_cast<char>(nameEvent.text.unicode);
                     }
                 }
             }
@@ -82,23 +108,22 @@ void LevelCreator::handleInput(Game& game) {
 }
 
 void LevelCreator::update(Game& game) {
-    if (isDrawing) {
-        sf::Vector2f currentMousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(game.window));
-        if (wallPoints.empty() || (currentMousePos != wallPoints.back())) {
-            wallPoints.push_back(currentMousePos);
-        }
+    sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
+
+    float snappedX = static_cast<int>(mousePos.x / game.getTileSize()) * game.getTileSize();
+    float snappedY = static_cast<int>(mousePos.y / game.getTileSize()) * game.getTileSize();
+
+    if (!placedTiles.empty()) {
+        placedTiles.back().setPosition(snappedX, snappedY);
+        placedTiles.back().setTexture(tiles[selectedTile]);
     }
 }
 
 void LevelCreator::render(Game& game) {
     game.window.clear();
 
-    for (size_t i = 1; i < wallPoints.size(); ++i) {
-        sf::Vertex line[] = {
-            sf::Vertex(wallPoints[i - 1], sf::Color::Red),
-            sf::Vertex(wallPoints[i], sf::Color::Red)
-        };
-        game.window.draw(line, 2, sf::PrimitiveType::Lines);
+    for (const auto& tile : placedTiles) {
+        game.window.draw(tile);
     }
 
     game.window.draw(saveButton);
@@ -126,14 +151,18 @@ void LevelCreator::saveWallToCSV(const std::string& filename) {
         return;
     }
 
-    for (const auto& point : wallPoints) {
-        file << point.x << "," << point.y << std::endl;
+
+    for (size_t i = 0; i < placedTiles.size(); ++i) {
+        sf::Vector2f position = placedTiles[i].getPosition();
+        file << static_cast<int>(position.x) << "," << static_cast<int>(position.y) << "," << textureIDs[i] << std::endl;
     }
 
     file.close();
 }
 
-void LevelCreator::clearDrawing(Game &game) {
-    wallPoints.clear();
+void LevelCreator::clearDrawing(Game& game) {
+    placedTiles.clear();
+    textureIDs.clear();
+
     game.changeState(std::make_shared<MenuState>());
 }

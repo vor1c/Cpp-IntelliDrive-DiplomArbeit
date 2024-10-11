@@ -10,6 +10,9 @@
 
 class PauseState : public State {
 public:
+
+    PauseState();
+
     void handleInput(Game& game) override;
     void update(Game& game) override;
     void render(Game& game) override;

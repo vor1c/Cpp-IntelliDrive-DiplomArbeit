@@ -4,12 +4,40 @@
 
 #include "../include/LevelSelectState.h"
 #include "../include/GameState.h"
+#include "../include/ResourceManager.h"
 #include <filesystem>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
-LevelSelectState::LevelSelectState() : currentPage(0) {
-    if (!font.loadFromFile("resources/Rubik-Regular.ttf")) {
-        std::cerr << "Error loading font" << std::endl;
-    }
+LevelSelectState::LevelSelectState() : currentPage(0), levelsPerPage(6) {
+    defaultWindowSize = sf::Vector2u(1920, 1080);
+
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+    resourceManager.loadFont("Rubik-Regular", "resources/Fonts/Rubik-Regular.ttf");
+    resourceManager.loadFont("UpheavalPRO", "resources/Fonts/UpheavalPRO.ttf");
+
+    font = resourceManager.getFont("Rubik-Regular");
+    titlefont = resourceManager.getFont("UpheavalPRO");
+
+    resourceManager.loadTexture("LevelSelectBackground", "resources/backgrounds/carchoosingstatebackground.png");
+    backgroundTexture = resourceManager.getTexture("LevelSelectBackground");
+    backgroundSprite.setTexture(backgroundTexture);
+
+    titleText.setFont(titlefont);
+    titleText.setString("LEVEL SELECTION");
+    titleText.setCharacterSize(125);
+    titleText.setFillColor(sf::Color::White);
+    titleText.setPosition(defaultWindowSize.x / 2.0f - (titleText.getLocalBounds().width / 2), 40);
+
+    resourceManager.loadTexture("ArrowLeft", "resources/GUI/arrowleft.png");
+    resourceManager.loadTexture("ArrowRight", "resources/GUI/arrowright.png");
+
+    arrowLeftTexture = resourceManager.getTexture("ArrowLeft");
+    arrowRightTexture = resourceManager.getTexture("ArrowRight");
+    arrowLeftSprite.setTexture(arrowLeftTexture);
+    arrowRightSprite.setTexture(arrowRightTexture);
+
     loadLevelFiles();
     createLevelButtons();
 }
@@ -19,15 +47,13 @@ void LevelSelectState::loadLevelFiles() {
     for (const auto& entry : std::filesystem::directory_iterator(path)) {
         if (entry.path().extension() == ".csv") {
             std::string filename = entry.path().filename().string();
-            if (filename != "cars.csv") { 
+            if (filename != "cars.csv") {
                 levelFiles.push_back(filename);
             }
         }
     }
     totalPages = (levelFiles.size() + levelsPerPage - 1) / levelsPerPage;
 }
-
-
 
 void LevelSelectState::handleInput(Game& game) {
     sf::Event event;
@@ -39,20 +65,23 @@ void LevelSelectState::handleInput(Game& game) {
         if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
             sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
 
+            // Handle level selection
             for (int i = 0; i < levelsPerPage; ++i) {
                 if (i + currentPage * levelsPerPage >= levelFiles.size()) break;
                 if (levelButtons[i].getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
                     std::string selectedLevel = "resources/" + levelFiles[i + currentPage * levelsPerPage];
-                    game.changeState(std::make_shared<GameState>(game, selectedLevel)); // Pass the selected level to GameState
+                    game.changeState(std::make_shared<GameState>(game, selectedLevel));
                 }
             }
 
-
-            if (nextPageButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
+            // Handle right arrow click (next page)
+            if (arrowRightSprite.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
                 currentPage = (currentPage + 1) % totalPages;
                 createLevelButtons();
             }
-            if (prevPageButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
+
+            // Handle left arrow click (previous page)
+            if (arrowLeftSprite.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
                 currentPage = (currentPage - 1 + totalPages) % totalPages;
                 createLevelButtons();
             }
@@ -60,39 +89,73 @@ void LevelSelectState::handleInput(Game& game) {
     }
 }
 
-
 void LevelSelectState::update(Game& game) {
     sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
     for (auto& button : levelButtons) {
         button.setFillColor(sf::Color::White);
         if (button.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
-            button.setFillColor(sf::Color(255, 215, 0));
+            button.setFillColor(sf::Color(255, 215, 0)); // Highlight button on hover
         }
     }
 }
 
 void LevelSelectState::render(Game& game) {
     game.window.clear();
+    game.window.draw(backgroundSprite);
+    game.window.draw(titleText);
 
-    for (int i = 0; i < 4; ++i) {
+    float previewWidth = 640.0f / 2.0f;
+    float previewHeight = 360.0f / 2.0f;
+    float verticalSpacing = 30.0f;
+
+    for (int i = 0; i < levelsPerPage; ++i) {
         if (i + currentPage * levelsPerPage >= levelFiles.size()) break;
+
+        int row = i / 2;
+        int col = i % 2;
+
+        sf::RectangleShape preview(sf::Vector2f(previewWidth, previewHeight));
+        preview.setPosition(levelButtons[i].getPosition().x + (levelButtons[i].getSize().x - previewWidth) / 2,
+                            levelButtons[i].getPosition().y + levelButtons[i].getSize().y + verticalSpacing);
+
+        preview.setOutlineColor(sf::Color::White);
+        preview.setOutlineThickness(1.0f);
+        preview.setFillColor(sf::Color::Transparent);
+
         game.window.draw(levelButtons[i]);
         game.window.draw(levelTexts[i]);
 
-        sf::RectangleShape preview(sf::Vector2f(50.0f, 50.0f));
-        preview.setFillColor(sf::Color::Blue); // Set color to make it visible
-        loadLevelPreview("resources/" + levelFiles[i + currentPage * levelsPerPage], preview);
-        preview.setPosition(levelButtons[i].getPosition().x + 420.0f, levelButtons[i].getPosition().y);
+        // Load and render preview elements
+        loadLevelPreview(game, "resources/" + levelFiles[i + currentPage * levelsPerPage], preview);
         game.window.draw(preview);
     }
 
-    game.window.draw(nextPageButton);
-    game.window.draw(prevPageButton);
+    // Draw navigation arrows
+    game.window.draw(arrowRightSprite);
+    game.window.draw(arrowLeftSprite);
+
 }
 
+void LevelSelectState::loadLevelPreview(Game& game, const std::string& filename, sf::RectangleShape& preview) {
+    ResourceManager& resourceManager = ResourceManager::getInstance();
 
+    if (cachedPreviews.find(filename) != cachedPreviews.end()) {
+        for (const auto& element : cachedPreviews[filename]) {
+            game.window.draw(element);
+        }
+        return;
+    }
 
-void LevelSelectState::loadLevelPreview(const std::string& filename, sf::RectangleShape& preview) {
+    if (bulkTextures.empty()) {
+        resourceManager.loadTexturesInBulk("resources/tiles/Asphalt road/", "road_asphalt", ".png");
+        bulkTextures = resourceManager.getBulkTextures();
+
+        if (bulkTextures.empty()) {
+            std::cerr << "Failed to load bulk textures!" << std::endl;
+            return;
+        }
+    }
+
     std::ifstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Error opening level preview: " << filename << std::endl;
@@ -100,53 +163,84 @@ void LevelSelectState::loadLevelPreview(const std::string& filename, sf::Rectang
     }
 
     std::string line;
-    int count = 0;
-    while (std::getline(file, line) && count < 10) {
+    float previewWidth = preview.getSize().x;
+    float previewHeight = preview.getSize().y;
+    float levelWidth = 1920.0f;
+    float levelHeight = 1080.0f;
+    float scaleX = previewWidth / levelWidth;
+    float scaleY = previewHeight / levelHeight;
+
+    std::vector<sf::Sprite> previewElements;
+
+    int textureIndex = 0;
+
+    while (std::getline(file, line)) {
         std::stringstream ss(line);
         std::string xStr, yStr;
 
         if (std::getline(ss, xStr, ',') && std::getline(ss, yStr, ',')) {
             try {
                 if (!xStr.empty() && !yStr.empty()) {
-                    float x = std::stof(xStr);
-                    float y = std::stof(yStr);
-                    preview.setPosition(x, y);
-                } else {
-                    std::cerr << "Invalid coordinates in line: " << line << std::endl;
+                    float x = std::stof(xStr) * scaleX;
+                    float y = std::stof(yStr) * scaleY;
+
+                    sf::Sprite element;
+                    element.setTexture(bulkTextures[textureIndex % bulkTextures.size()]);
+                    element.setPosition(preview.getPosition().x + x, preview.getPosition().y + y);
+                    element.setScale(scaleX, scaleY); // Scale the sprite to fit the preview
+
+                    previewElements.push_back(element);
+                    textureIndex++;
+
+
+                    if (previewElements.size() > 10000) {
+                        std::cerr << "Too many tiles in the preview!" << std::endl;
+                        break;
+                    }
                 }
             } catch (const std::invalid_argument&) {
-                std::cerr << "Invalid argument in line: " << line << std::endl;
+                std::cerr << "Invalid coordinate data in preview" << std::endl;
             } catch (const std::out_of_range&) {
-                std::cerr << "Out of range in line: " << line << std::endl;
+                std::cerr << "Coordinate out of range in preview" << std::endl;
             }
-        } else {
-            std::cerr << "Could not read two values from line: " << line << std::endl;
         }
-        count++;
     }
+
+    cachedPreviews[filename] = previewElements;
     file.close();
+
+    for (const auto& element : previewElements) {
+        game.window.draw(element);
+    }
 }
-
-
 
 void LevelSelectState::createLevelButtons() {
     levelButtons.clear();
     levelTexts.clear();
 
-    float startX = 100.0f, startY = 150.0f;
-    float offsetY = 100.0f;
+    float windowHeight = 1080.0f;
+    float windowWidth = 1920.0f;
+
+    float buttonWidth = 400.0f;
+    float buttonHeight = 50.0f;
+    float previewSize = 200.0f;
+    float verticalSpacing = (windowHeight - (2 * buttonHeight + 2 * previewSize)) / 3;
 
     for (int i = 0; i < levelsPerPage; ++i) {
+        int row = i / 2;
+        int col = i % 2;
+
         sf::RectangleShape button;
-        button.setSize({400.0f, 50.0f});
-        button.setPosition(startX, startY + i * offsetY);
-        button.setFillColor(sf::Color::White);
+        button.setSize({buttonWidth, buttonHeight});
+        button.setPosition(col * (windowWidth / 2) + (windowWidth / 4) - (buttonWidth / 2),
+                           verticalSpacing + row * (buttonHeight + previewSize + verticalSpacing));
+        button.setFillColor(sf::Color::Red);
 
         sf::Text buttonText;
         buttonText.setFont(font);
         buttonText.setFillColor(sf::Color::Black);
         buttonText.setCharacterSize(20);
-        buttonText.setPosition(startX + 10.0f, startY + i * offsetY + 10.0f);
+        buttonText.setPosition(button.getPosition().x + 10.0f, button.getPosition().y + 10.0f);
 
         if (i + currentPage * levelsPerPage < levelFiles.size()) {
             buttonText.setString(levelFiles[i + currentPage * levelsPerPage]);
@@ -159,12 +253,10 @@ void LevelSelectState::createLevelButtons() {
     }
 
 
-    nextPageButton.setSize({200.0f, 50.0f});
-    nextPageButton.setPosition(700.0f, 600.0f);
-    nextPageButton.setFillColor(sf::Color::Green);
+    float arrowScale = 0.1f;
+    arrowLeftSprite.setScale(arrowScale, arrowScale);
+    arrowRightSprite.setScale(arrowScale, arrowScale);
 
-    prevPageButton.setSize({200.0f, 50.0f});
-    prevPageButton.setPosition(100.0f, 600.0f);
-    prevPageButton.setFillColor(sf::Color::Green);
+    arrowLeftSprite.setPosition(50.0f, windowHeight / 2 - arrowLeftSprite.getGlobalBounds().height / 2);
+    arrowRightSprite.setPosition(windowWidth - arrowRightSprite.getGlobalBounds().width - 50.0f, windowHeight / 2 - arrowRightSprite.getGlobalBounds().height / 2);
 }
-
