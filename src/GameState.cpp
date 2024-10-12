@@ -8,10 +8,35 @@
 #include "../include/Car.h"
 #include "../include/Game.h"
 
+#define M_PI 3.141592653589793238462643383279502884197169399375105820974944 // würd es genauer machen aber mir war langweilg
+
+bool getLineIntersection(sf::Vector2f p0, sf::Vector2f p1,
+                         sf::Vector2f p2, sf::Vector2f p3,
+                         sf::Vector2f& intersectionPoint) { //wenn du das verstehen willst -> vergiss es ned mal chatgpt weiß wos des is
+    sf::Vector2f s1 = p1 - p0;
+    sf::Vector2f s2 = p3 - p2;
+
+    float s, t;
+    float denominator = (-s2.x * s1.y + s1.x * s2.y);
+
+    if (fabs(denominator) < 1e-6)
+        return false;
+    //wenn das ned geht tot
+    s = (-s1.y * (p0.x - p2.x) + s1.x * (p0.y - p2.y)) / denominator;
+    t = ( s2.x * (p0.y - p2.y) - s2.y * (p0.x - p2.x)) / denominator;
+
+    if (s >= 0 && s <= 1 && t >= 0 && t <= 1) { // https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect <--- das is alles kopiert aber egal
+        intersectionPoint = p0 + (t * s1);
+        return true;
+    }
+
+    return false;
+}
+
 GameState::GameState(Game& game, const std::string& levelFile) : car(game.getCar()) {
     initializeCar();
+    initialiazeRays();
     placedTiles.clear();
-
 
     ResourceManager& resourceManager = ResourceManager::getInstance();
     resourceManager.loadTexturesInBulk("resources/Tiles/Asphalt road/", "road_asphalt", ".png");
@@ -59,9 +84,158 @@ void GameState::loadLevelFromCSV(const std::string& filename, Game &game) {
 
 }
 
+void GameState::initialiazeRays() {
+    //haha init (alles is pfusch hier)
+    rayDistances.resize(5, 0.0f);
+    rays.resize(5);
+    collisionMarkers.reserve(5);
+}
+
+void GameState::performRaycasts(Game& game) {
+    float rotation_angle = car.getRotationAngle();
+    sf::Vector2f carPosition = car.getCurrentPosition();
+
+    std::vector<float> rayAngles = {
+        rotation_angle - 90.0f,
+        rotation_angle + 90.0f,
+        rotation_angle,
+        rotation_angle - 45.0f,
+        rotation_angle + 45.0f
+    };
+
+    for (auto& angle : rayAngles) {
+        if (angle < 0.0f) angle += 360.0f;
+        if (angle >= 360.0f) angle -= 360.0f;
+    }
+
+    float maxRayLength = 1000000.0f;
+
+    collisionMarkers.clear();
+
+    for (size_t i = 0; i < rayAngles.size(); ++i) {
+        float angle = rayAngles[i];
+        float radian_angle = angle * (M_PI / 180.0f);
+        sf::Vector2f direction(std::sin(radian_angle), -std::cos(radian_angle));
+
+        sf::Vector2f rayEnd = carPosition + direction * maxRayLength;
+
+        float minDistance = maxRayLength;
+        sf::Vector2f closestPoint = rayEnd;
+
+        for (const auto& wall : walls) {
+            sf::FloatRect wallBounds = wall.getGlobalBounds();
+            //wenn ich ehrlich bin idk wie der kakc funktioniert
+            sf::Vector2f p1(wallBounds.left, wallBounds.top);
+            sf::Vector2f p2(wallBounds.left + wallBounds.width, wallBounds.top);
+            sf::Vector2f p3(wallBounds.left + wallBounds.width, wallBounds.top + wallBounds.height);
+            sf::Vector2f p4(wallBounds.left, wallBounds.top + wallBounds.height);
+
+            std::vector<std::pair<sf::Vector2f, sf::Vector2f>> edges = {
+                {p1, p2},
+                {p2, p3},
+                {p3, p4},
+                {p4, p1}
+            };
+
+            for (const auto& edge : edges) {
+                sf::Vector2f intersectionPoint;
+                if (getLineIntersection(carPosition, rayEnd, edge.first, edge.second, intersectionPoint)) {
+                    float distance = sqrtf((intersectionPoint.x - carPosition.x) * (intersectionPoint.x - carPosition.x) +
+                                           (intersectionPoint.y - carPosition.y) * (intersectionPoint.y - carPosition.y));
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestPoint = intersectionPoint;
+                    }
+                }
+            }
+        }
+
+        rayDistances[i] = minDistance;
+        //haha HUbersohn
+        sf::VertexArray ray(sf::Lines, 2);
+        ray[0].position = carPosition;
+        ray[0].color = sf::Color(0, 255, 0, 255);;
+        ray[1].position = closestPoint;
+        ray[1].color = sf::Color(0, 255, 0, 255);
+        rays[i] = ray;
+
+        sf::VertexArray collisionMarker(sf::Lines, 4);
+
+        float markerSize = 15.0f;
+
+        sf::Color markerColor(0, 255, 80, 255); // RGBA: Grey with 50% transparency
+
+        collisionMarker[0].position = closestPoint + sf::Vector2f(-markerSize, -markerSize);
+        collisionMarker[0].color = markerColor;
+        collisionMarker[1].position = closestPoint + sf::Vector2f(markerSize, markerSize);
+        collisionMarker[1].color = markerColor;
+
+        collisionMarker[2].position = closestPoint + sf::Vector2f(markerSize, -markerSize);
+        collisionMarker[2].color = markerColor;
+        collisionMarker[3].position = closestPoint + sf::Vector2f(-markerSize, markerSize);
+        collisionMarker[3].color = markerColor;
+
+        collisionMarkers.push_back(collisionMarker);
+    }
+}
+
+
 void GameState::update(Game& game) {
     car.update(game.dt);
+    performRaycasts(game);
+
+    timeSinceLastPrint += game.dt;
+    if (timeSinceLastPrint >= 1.0f) {
+        std::cout << "Ray distances: ";
+        for (size_t i = 0; i < rayDistances.size(); ++i) {
+            std::cout << rayDistances[i] << " ";
+        }
+        std::cout << std::endl;
+
+        timeSinceLastPrint = 0.0f;
+    }
+
+    sf::FloatRect carBounds = car.getBounds();
+
+    for (const auto& wall : walls) {
+        if (carBounds.intersects(wall.getGlobalBounds())) {
+            game.changeState(std::make_shared<DeathState>());
+            return;
+        }
+    }
 }
+
+void GameState::debugDrawing(Game& game) {
+    walls.clear();
+
+    float thickness = 5.0f;
+    sf::Vector2u windowSize = game.window.getSize();
+
+    sf::RectangleShape topWall(sf::Vector2f(windowSize.x, thickness));
+    topWall.setPosition(0, 0);
+    topWall.setFillColor(sf::Color::Red);
+    walls.push_back(topWall);
+
+    sf::RectangleShape bottomWall(sf::Vector2f(windowSize.x, thickness));
+    bottomWall.setPosition(0, windowSize.y - thickness);
+    bottomWall.setFillColor(sf::Color::Red);
+    walls.push_back(bottomWall);
+
+    sf::RectangleShape leftWall(sf::Vector2f(thickness, windowSize.y));
+    leftWall.setPosition(0, 0);
+    leftWall.setFillColor(sf::Color::Red);
+    walls.push_back(leftWall);
+
+    sf::RectangleShape rightWall(sf::Vector2f(thickness, windowSize.y));
+    rightWall.setPosition(windowSize.x - thickness, 0);
+    rightWall.setFillColor(sf::Color::Red);
+    walls.push_back(rightWall);
+
+    for (const auto& wall : walls) {
+        game.window.draw(wall);
+    }
+}
+//wenn du das liest bist du ein hurensohn
 
 void GameState::render(Game& game) {
     game.window.clear();
@@ -69,6 +243,17 @@ void GameState::render(Game& game) {
         game.window.draw(placedTiles[i]);
     }
     car.render(game.window);
+
+    for (const auto& ray : rays) {
+        game.window.draw(ray);
+    }
+
+    for (const auto& collisionMarker : collisionMarkers) {
+        game.window.draw(collisionMarker);
+    }
+
+    debugDrawing(game);
+
 }
 
 void GameState::initializeCar() {

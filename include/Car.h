@@ -28,7 +28,7 @@ struct carData{
 
 class Car {
 public:
-    Car() = default;
+    Car();
 
     void handleInput();
     void update(float dt);
@@ -42,24 +42,30 @@ public:
     void applyData(carData &data);
 
     sf::Sprite &getCarSprite() { return carSprite; }
-    void setPreviousPosition(sf::Vector2<double> previousPosition) {previous_position = previousPosition;};
-    void setCurrentPosition(sf::Vector2<double> currentPosition) {current_position = currentPosition;};
+    void setPreviousPosition(const sf::Vector2f& previousPosition) { previous_position = previousPosition; };
+    void setCurrentPosition(const sf::Vector2f& currentPosition) { current_position = currentPosition; };
+    float getRotationAngle() const { return rotation_angle; }
+    sf::Vector2f getCurrentPosition() const { return current_position; }
 
 private:
     sf::Sprite carSprite;
     sf::Vector2f direction;
+    sf::Vector2f velocity;
+    sf::Vector2f current_position;
+    sf::Vector2f previous_position;
 
-    double rotation_angle = 0.0f;
-    double angular_acceleration = 0.0f;
-    double angular_acceleration_constant = 10.0f;
+    float angular_velocity;
+    float rotation_angle;
+    float acceleration;
+    float angular_acceleration;
+    float friction;
+    float acceleration_constant;
+    float angular_acceleration_constant;
+    float friction_coefficient;
+    float angular_damping;
 
-    double acceleration = 0.0f;
-    double acceleration_constant = 1000.0f;
 
-    double friction = 1.01f;
 
-    sf::Vector2<double> previous_position;
-    sf::Vector2<double> current_position;
 };
 
 #endif //CAR_H

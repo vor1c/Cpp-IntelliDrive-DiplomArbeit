@@ -25,11 +25,19 @@ public:
 
 private:
     Car& car;
+    float timeSinceLastPrint = 0.0f;
 
+    std::vector<float> rayDistances;
+    std::vector<sf::VertexArray> rays;
+    std::vector<sf::VertexArray> collisionMarkers;
+    std::vector<sf::RectangleShape> walls;
     std::vector<sf::Sprite> placedTiles;
     std::vector<sf::Texture> tiles;
 
+    void debugDrawing(Game& game);
     void initializeCar();
+    void performRaycasts(Game& game);
+    void initialiazeRays();
     bool isPauseKeyPressed(const sf::Event& event) const;
     sf::RectangleShape createRoad(Game& game) const;
 };
