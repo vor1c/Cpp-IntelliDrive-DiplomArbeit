@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(IntelliDrive VERSION 0.1.0)
 
-# Set C++ standard to C++17
-set(CMAKE_CXX_STANDARD 17)
+# Set C++ standard to C++20
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Set the output directory for binaries

@@ -44,6 +44,8 @@ public:
     sf::Sprite &getCarSprite() { return carSprite; }
     void setPreviousPosition(const sf::Vector2f& previousPosition) { previous_position = previousPosition; };
     void setCurrentPosition(const sf::Vector2f& currentPosition) { current_position = currentPosition; };
+    float getRotationAngle() const { return rotation_angle; }
+    sf::Vector2f getCurrentPosition() const { return current_position; }
 
 private:
     sf::Sprite carSprite;
