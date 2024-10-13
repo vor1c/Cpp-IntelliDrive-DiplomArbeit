@@ -142,13 +142,13 @@ void Game::parseCarDataLine(const std::string& line, carData& data, ResourceMana
                 data.carTexture = resourceManager.getTexture("CarTexture_" + data.name);
                 break;
             case 2:
-                data.maxSpeed = std::stof(token);
+                data.MaxSpeed = std::stof(token);
                 break;
             case 3:
-                data.handling = std::stof(token);
+                data.Handling = std::stof(token);
                 break;
             case 4:
-                data.acceleration = std::stof(token);
+                data.Acceleration = std::stof(token);
                 break;
             case 5:
                 data.weight = std::stof(token);

@@ -2,6 +2,12 @@
 // Created by Voric and tobisdev on 11/08/2024.
 //
 
+
+
+#ifndef CAR_H
+#define CAR_H
+
+#include <SFML/Graphics.hpp>
 #include <vector>
 #include <cmath>
 #include "SFML/Window/Keyboard.hpp"
@@ -10,15 +16,12 @@
 #include "SFML/Graphics/Sprite.hpp"
 #include "SFML/Graphics/Texture.hpp"
 
-#ifndef CAR_H
-#define CAR_H
-
-struct carData{
+struct carData {
     std::string name;
     sf::Texture carTexture;
-    float maxSpeed;
-    float handling;
-    float acceleration;
+    int MaxSpeed;
+    int Handling;
+    int Acceleration;
     float weight;
     float power;
     float torque;
@@ -32,40 +35,49 @@ public:
 
     void handleInput();
     void update(float dt);
-
-    void resetRotationAngle();
-
     void render(sf::RenderWindow& window);
-
+    void applyData(carData &data);
+    void resetRotationAngle();
     sf::FloatRect getBounds() const;
 
-    void applyData(carData &data);
+    float getRotationAngle() const;
+    sf::Vector2f getCurrentPosition() const;
+    sf::Sprite& getCarSprite();
 
-    sf::Sprite &getCarSprite() { return carSprite; }
-    void setPreviousPosition(const sf::Vector2f& previousPosition) { previous_position = previousPosition; };
-    void setCurrentPosition(const sf::Vector2f& currentPosition) { current_position = currentPosition; };
-    float getRotationAngle() const { return rotation_angle; }
-    sf::Vector2f getCurrentPosition() const { return current_position; }
+    void setPreviousPosition(const sf::Vector2f& position);
+    void setCurrentPosition(const sf::Vector2f& position);
 
 private:
     sf::Sprite carSprite;
-    sf::Vector2f direction;
-    sf::Vector2f velocity;
+
     sf::Vector2f current_position;
     sf::Vector2f previous_position;
-
-    float angular_velocity;
+    sf::Vector2f velocity;
     float rotation_angle;
+    float angular_velocity;
+
     float acceleration;
     float angular_acceleration;
-    float friction;
+
     float acceleration_constant;
     float angular_acceleration_constant;
-    float friction_coefficient;
+    float max_speed;
+
     float angular_damping;
+    float friction;
+    float friction_coefficient;
 
+    float maxSpeedValue;
+    float handlingValue;
+    float accelerationValue;
 
+    std::string name;
+    sf::Texture logoTexture;
+    float weight;
+    float power;
+    float torque;
+    std::string driveType;
 
 };
 
-#endif //CAR_H
+#endif // CAR_H

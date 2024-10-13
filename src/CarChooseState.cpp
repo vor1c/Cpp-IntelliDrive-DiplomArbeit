@@ -140,7 +140,7 @@ void CarChoosingState::renderBottomLine(Game& game) {
     driveTypeText.setFillColor(sf::Color::White);
 
     statBarsLabel.setString("Max Speed");
-    float barWidth = 20.0f * game.cars[selectedCarIndex].maxSpeed;
+    float barWidth = 20.0f * game.cars[selectedCarIndex].MaxSpeed;
     sf::RectangleShape speedBar(sf::Vector2f(barWidth, 20.0f));
     speedBar.setFillColor(sf::Color::Red);
     speedBar.setPosition(315.0f, legendheight - 60);
@@ -149,7 +149,7 @@ void CarChoosingState::renderBottomLine(Game& game) {
     game.window.draw(statBarsLabel);
 
     statBarsLabel.setString("Handling");
-    barWidth = 20.0f * game.cars[selectedCarIndex].handling;
+    barWidth = 20.0f * game.cars[selectedCarIndex].Handling;
     sf::RectangleShape handlingBar(sf::Vector2f(barWidth, 20.0f));
     handlingBar.setFillColor(sf::Color::Red);
     handlingBar.setPosition(315.0f, legendheight - 10);
@@ -158,7 +158,7 @@ void CarChoosingState::renderBottomLine(Game& game) {
     game.window.draw(statBarsLabel);
 
     statBarsLabel.setString("Acceleration");
-    barWidth = 20.0f * game.cars[selectedCarIndex].acceleration;
+    barWidth = 20.0f * game.cars[selectedCarIndex].Acceleration;
     sf::RectangleShape accelerationBar(sf::Vector2f(barWidth, 20.0f));
     accelerationBar.setFillColor(sf::Color::Red);
     accelerationBar.setPosition(315.0f, legendheight + 40);
