@@ -51,6 +51,18 @@ void Car::handleInput() {
     }
 }
 
+void Car::resetVelocity() {
+    velocity.x = 0.0f;
+    velocity.y = 0.0f;
+}
+
+void Car::resetAngularAcceleration() {
+    angular_acceleration = 0.0f;
+    acceleration = 0.0f;
+    angular_velocity = 0.0f;
+    angular_damping = 0.0f;
+}
+
 void Car::update(float dt) {
     float radian_angle = rotation_angle * (PI / 180.0f);
 

@@ -32,6 +32,9 @@ struct carData {
 class Car {
 public:
     Car();
+    void resetVelocity();
+
+    void resetAngularAcceleration();
 
     void handleInput();
     void update(float dt);
@@ -46,13 +49,13 @@ public:
 
     void setPreviousPosition(const sf::Vector2f& position);
     void setCurrentPosition(const sf::Vector2f& position);
-
+    sf::Vector2f velocity;
 private:
     sf::Sprite carSprite;
 
     sf::Vector2f current_position;
     sf::Vector2f previous_position;
-    sf::Vector2f velocity;
+
     float rotation_angle;
     float angular_velocity;
 

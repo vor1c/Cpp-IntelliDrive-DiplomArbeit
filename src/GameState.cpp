@@ -260,6 +260,8 @@ void GameState::initializeCar() {
     sf::Sprite &carSprite = car.getCarSprite();
     carSprite.setOrigin(carSprite.getLocalBounds().width / 2, carSprite.getLocalBounds().height / 2);
     carSprite.setPosition(400, 400);
+    car.resetVelocity();
+    car.resetAngularAcceleration();
     car.resetRotationAngle();
     car.setPreviousPosition({carSprite.getPosition().x, carSprite.getPosition().y});
     car.setCurrentPosition({carSprite.getPosition().x, carSprite.getPosition().y});
