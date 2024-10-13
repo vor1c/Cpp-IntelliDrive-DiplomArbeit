@@ -4,7 +4,6 @@
 
 #include "../include/Game.h"
 #include "../include/MenuState.h"
-//#include "../include/FileSystem.h"
 
 int main() {
     Game game;

@@ -46,7 +46,7 @@ void Game::run() {
             currentState->update(*this);
             window.clear();
             currentState->render(*this);
-            calculateAndDisplayFPS();
+            //calculateAndDisplayFPS();
             window.display();
         }
     }
