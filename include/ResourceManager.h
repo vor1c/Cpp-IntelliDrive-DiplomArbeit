@@ -18,7 +18,10 @@ public:
     void loadFont(const std::string& name, const std::string& filename);
     sf::Font& getFont(const std::string& name);
 
-    void loadTexture(const std::string& name, const std::string& filename);
+    bool loadTexture(const std::string &name, const std::string &filename);
+
+    void setTexture(const std::string &name, const std::string &filename);
+
     sf::Texture& getTexture(const std::string& name);
 
     void loadTexturesInBulk(const std::string& path, const std::string& prefix, const std::string& postfix);

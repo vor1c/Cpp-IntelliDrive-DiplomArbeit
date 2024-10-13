@@ -25,6 +25,19 @@ void LevelCreator::initializeResources(Game& game) {
 
     resourceManager.loadFont("Rubik-Regular", "resources/Fonts/Rubik-Regular.ttf");
     font = resourceManager.getFont("Rubik-Regular");
+/*
+    resourceManager.loadTexture("background5", "resources/Backgrounds/background.webp");
+    resourceManager.setTexture("backgroundlc", "resources/background.webp");
+    sf::Texture& backgroundTexture = resourceManager.getTexture("backgroundlc");
+    backgroundSprite.setTexture(backgroundTexture);
+
+    sf::Vector2u windowSize = game.window.getSize();
+    sf::Vector2u textureSize = backgroundTexture.getSize();
+    backgroundSprite.setScale(
+        static_cast<float>(windowSize.x) / textureSize.x,
+        static_cast<float>(windowSize.y) / textureSize.y
+    );
+    */
 }
 
 void LevelCreator::createButtons(Game& game) {
@@ -212,6 +225,8 @@ void LevelCreator::updatePreviewTile(Game& game) {
 
 void LevelCreator::render(Game& game) {
     game.window.clear();
+
+    game.window.draw(backgroundSprite);
 
     drawPlacedTiles(game);
 

@@ -52,6 +52,7 @@ private:
     std::vector<sf::Texture> tiles;
 
     std::vector<sf::Sprite> placedTiles;
+    sf::Sprite backgroundSprite;
     std::vector<int> textureIDs;
 
     int selectedTile = 0;

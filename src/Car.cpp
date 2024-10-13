@@ -8,9 +8,8 @@
 
 constexpr float PI = 3.14159265f;
 
-// Maximum possible values for scaling
-constexpr float MAX_ACCELERATION_CONSTANT = 1200.0f; // Units: pixels per second squared
-constexpr float MAX_ANGULAR_ACCELERATION_CONSTANT = 100.0f; // Units: degrees per second squared
+constexpr float MAX_ACCELERATION_CONSTANT = 1000.0f; // Units: pixels per second squared
+constexpr float MAX_ANGULAR_ACCELERATION_CONSTANT = 200.0f; // Units: degrees per second squared
 constexpr float MAX_SPEED = 900.0f; // Units: pixels per second
 
 Car::Car()
@@ -23,8 +22,8 @@ Car::Car()
       angular_acceleration(0.0f),
       angular_damping(0.1f),
       friction(0.01f),
-      friction_coefficient(1.0f), // Adjust between 0 (no friction) and 1 (full stop instantly)
-      acceleration_constant(0.1f),
+      friction_coefficient(0.30f), // Adjust between 0 (no friction) and 1 (full stop instantly)
+      acceleration_constant(10.1f),
       angular_acceleration_constant(0.1f),
       max_speed(10.0f),
       maxSpeedValue(5.0f),
