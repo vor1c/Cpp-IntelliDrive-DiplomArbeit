@@ -10,30 +10,37 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include "Tile.h"
 
 class ResourceManager {
 public:
     static ResourceManager& getInstance();
 
     void loadFont(const std::string& name, const std::string& filename);
-    sf::Font& getFont(const std::string& name);
+    [[ nodiscard ]] sf::Font& getFont(const std::string& name);
 
     bool loadTexture(const std::string &name, const std::string &filename);
-
     void setTexture(const std::string &name, const std::string &filename);
 
-    sf::Texture& getTexture(const std::string& name);
+    [[ nodiscard ]] sf::Texture& getTexture(const std::string& name);
 
-    void loadTexturesInBulk(const std::string& path, const std::string& prefix, const std::string& postfix);
-    const std::vector<sf::Texture>& getBulkTextures();
+    void setTiles(std::vector<Tile> &t) { tiles = t; };
+    [[ nodiscard ]] std::vector<Tile> &getTiles() { return tiles; };
+
+    void saveTilesToCSV(const std::string& filename);
+    void loadTilesFromCSV(const std::string& filename);
+
+    void setTile(int i, Tile &t) { tiles[i] = t; };
+    [[ nodiscard ]] Tile &getTile(int i) { return tiles[i]; };
 
 private:
     ResourceManager() = default;
 
     std::unordered_map<std::string, sf::Font> fonts;
     std::unordered_map<std::string, sf::Texture> textures;
-
-    std::vector<sf::Texture> bulkTextures;
+    std::vector<Tile> tiles;
 };
 
 #endif // RESOURCEMANAGER_H

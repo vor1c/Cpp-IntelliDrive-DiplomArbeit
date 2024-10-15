@@ -5,10 +5,6 @@
 #include "../include/LevelSelectState.h"
 #include "../include/GameState.h"
 #include "../include/ResourceManager.h"
-#include <filesystem>
-#include <iostream>
-#include <fstream>
-#include <sstream>
 
 LevelSelectState::LevelSelectState() : currentPage(0), levelsPerPage(6) {
     defaultWindowSize = sf::Vector2u(1920, 1080);
@@ -40,16 +36,17 @@ LevelSelectState::LevelSelectState() : currentPage(0), levelsPerPage(6) {
 
     loadLevelFiles();
     createLevelButtons();
+
+    resourceManager.loadTilesFromCSV("resources/Tiles/Tiles.csv");
+    tiles = resourceManager.getTiles();
 }
 
 void LevelSelectState::loadLevelFiles() {
-    std::string path = "resources/";
+    std::string path = "resources/Levels/";
     for (const auto& entry : std::filesystem::directory_iterator(path)) {
         if (entry.path().extension() == ".csv") {
             std::string filename = entry.path().filename().string();
-            if (filename != "cars.csv") {
-                levelFiles.push_back(filename);
-            }
+            levelFiles.push_back(filename);
         }
     }
     totalPages = (levelFiles.size() + levelsPerPage - 1) / levelsPerPage;
@@ -69,7 +66,7 @@ void LevelSelectState::handleInput(Game& game) {
             for (int i = 0; i < levelsPerPage; ++i) {
                 if (i + currentPage * levelsPerPage >= levelFiles.size()) break;
                 if (levelButtons[i].getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
-                    std::string selectedLevel = "resources/" + levelFiles[i + currentPage * levelsPerPage];
+                    std::string selectedLevel = "resources/Levels/" + levelFiles[i + currentPage * levelsPerPage];
                     game.changeState(std::make_shared<GameState>(game, selectedLevel));
                 }
             }
@@ -146,16 +143,6 @@ void LevelSelectState::loadLevelPreview(Game& game, const std::string& filename,
         return;
     }
 
-    if (bulkTextures.empty()) {
-        resourceManager.loadTexturesInBulk("resources/tiles/Asphalt road/", "road_asphalt", ".png");
-        bulkTextures = resourceManager.getBulkTextures();
-
-        if (bulkTextures.empty()) {
-            std::cerr << "Failed to load bulk textures!" << std::endl;
-            return;
-        }
-    }
-
     std::ifstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Error opening level preview: " << filename << std::endl;
@@ -185,7 +172,7 @@ void LevelSelectState::loadLevelPreview(Game& game, const std::string& filename,
                     float y = std::stof(yStr) * scaleY;
 
                     sf::Sprite element;
-                    element.setTexture(bulkTextures[textureIndex % bulkTextures.size()]);
+                    element.setTexture(tiles[textureIndex % tiles.size()].getTexture());
                     element.setPosition(preview.getPosition().x + x, preview.getPosition().y + y);
                     element.setScale(scaleX, scaleY); // Scale the sprite to fit the preview
 

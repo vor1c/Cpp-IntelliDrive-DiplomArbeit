@@ -23,6 +23,8 @@ add_executable(${PROJECT_NAME} ${ALL_SOURCE_FILES} ${ALL_HEADER_FILES}
         include/LevelCreator.h
         src/LevelSelectState.cpp
         include/LevelSelectState.h
+        include/Tile.h
+        src/Tile.cpp
 )
 
 # Use C++17 standards
@@ -64,21 +66,21 @@ if (WIN32)
 
     # List of required DLLs
     set(SFML_DLLS
-            ${SFML_DLLS_DIR}/sfml-graphics-2.dll
-            ${SFML_DLLS_DIR}/sfml-window-2.dll
-            ${SFML_DLLS_DIR}/sfml-system-2.dll
+            "${SFML_DLLS_DIR}/sfml-graphics-2.dll"
+            "${SFML_DLLS_DIR}/sfml-window-2.dll"
+            "${SFML_DLLS_DIR}/sfml-system-2.dll"
     )
 
     set(GCC_DLLS
-            ${GCC_DLLS_DIR}/libgcc_s_seh-1.dll
-            ${GCC_DLLS_DIR}/libstdc++-6.dll
-            ${GCC_DLLS_DIR}/libwinpthread-1.dll
+            "${GCC_DLLS_DIR}/libgcc_s_seh-1.dll"
+            "${GCC_DLLS_DIR}/libstdc++-6.dll"
+            "${GCC_DLLS_DIR}/libwinpthread-1.dll"
     )
 
     # Add custom command to copy SFML DLLs
     foreach(dll ${SFML_DLLS})
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different ${dll} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${dll}" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
                 COMMENT "Copying SFML DLL ${dll} to output directory"
         )
     endforeach()
@@ -86,7 +88,7 @@ if (WIN32)
     # Add custom command to copy GCC DLLs
     foreach(dll ${GCC_DLLS})
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different ${dll} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${dll}" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
                 COMMENT "Copying GCC DLL ${dll} to output directory"
         )
     endforeach()

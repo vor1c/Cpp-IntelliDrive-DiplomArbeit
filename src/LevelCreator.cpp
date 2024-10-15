@@ -15,13 +15,21 @@
 LevelCreator::LevelCreator(Game& game) : showExplanation(true) {
     initializeResources(game);
     createButtons(game);
+
+    boundaries = {static_cast<int>(game.window.getSize().x / game.getTileSize()), static_cast<int>(game.window.getSize().y / game.getTileSize())};
+
+    // Resize the vectors so they contain the necessary number of elements
+    placedTileIDs.resize(boundaries.x, std::vector<int>(boundaries.y, -1));
+    placedTileSprites.resize(boundaries.x, std::vector<sf::Sprite>(boundaries.y));
 }
 
 void LevelCreator::initializeResources(Game& game) {
     ResourceManager& resourceManager = ResourceManager::getInstance();
 
-    resourceManager.loadTexturesInBulk("resources/Tiles/Asphalt road/", "road_asphalt", ".png");
-    tiles = resourceManager.getBulkTextures();
+    resourceManager.loadTilesFromCSV("resources/Tiles/Tiles.csv");
+
+    // Load the tiles through the resource Manager
+    tiles = resourceManager.getTiles();
 
     resourceManager.loadFont("Rubik-Regular", "resources/Fonts/Rubik-Regular.ttf");
     font = resourceManager.getFont("Rubik-Regular");
@@ -169,40 +177,36 @@ void LevelCreator::handleKeyboardInput(const sf::Event& event, Game& game) {
 
 void LevelCreator::addTileAtMouse(Game& game) {
     sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
-    float snappedX = static_cast<int>(mousePos.x / game.getTileSize()) * game.getTileSize();
-    float snappedY = static_cast<int>(mousePos.y / game.getTileSize()) * game.getTileSize();
 
-    sf::FloatRect tileRect(snappedX, snappedY, game.getTileSize(), game.getTileSize());
+    sf::Vector2i grid(static_cast<int>(mousePos.x / game.getTileSize()), static_cast<int>(mousePos.y / game.getTileSize()));
 
-    for (const auto& tile : placedTiles) {
-        if (tile.getGlobalBounds().intersects(tileRect)) {
-            return;
-        }
+    if (grid.x < 0 || grid.x > boundaries.x || grid.y < 0 || grid.y > boundaries.y){
+        return; // Place no tiles if the cursor should be out of bounds
     }
 
+    float snappedX = grid.x * game.getTileSize();
+    float snappedY = grid.y * game.getTileSize();
+
     sf::Sprite s;
-    s.setTexture(tiles[selectedTile]);
+    s.setTexture(tiles[selectedTile].getTexture());
     s.setScale(game.getTileSize() / s.getLocalBounds().height, game.getTileSize() / s.getLocalBounds().height);
     s.setPosition(snappedX, snappedY);
 
-    textureIDs.emplace_back(selectedTile);
-    placedTiles.emplace_back(s);
+    placedTileIDs[grid.x][grid.y] = selectedTile;
+    placedTileSprites[grid.x][grid.y] = s;
 }
 
 void LevelCreator::removeTileAtMouse(Game& game) {
     sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
-    float snappedX = static_cast<int>(mousePos.x / game.getTileSize()) * game.getTileSize();
-    float snappedY = static_cast<int>(mousePos.y / game.getTileSize()) * game.getTileSize();
 
-    sf::FloatRect tileRect(snappedX, snappedY, game.getTileSize(), game.getTileSize());
+    sf::Vector2i grid(static_cast<int>(mousePos.x / game.getTileSize()), static_cast<int>(mousePos.y / game.getTileSize()));
 
-    for (size_t i = 0; i < placedTiles.size(); ++i) {
-        if (placedTiles[i].getGlobalBounds().intersects(tileRect)) {
-            placedTiles.erase(placedTiles.begin() + i);
-            textureIDs.erase(textureIDs.begin() + i);
-            break;
-        }
+    if (grid.x < 0 || grid.x > boundaries.x || grid.y < 0 || grid.y > boundaries.y){
+        return; // Place no tiles if the cursor should be out of bounds
     }
+
+    placedTileIDs[grid.x][grid.y] = -1;
+    placedTileSprites[grid.x][grid.y] = {};
 }
 
 void LevelCreator::update(Game& game) {
@@ -217,7 +221,7 @@ void LevelCreator::updatePreviewTile(Game& game) {
     float snappedX = static_cast<int>(mousePos.x / game.getTileSize()) * game.getTileSize();
     float snappedY = static_cast<int>(mousePos.y / game.getTileSize()) * game.getTileSize();
 
-    previewTile.setTexture(tiles[selectedTile]);
+    previewTile.setTexture(tiles[selectedTile].getTexture());
     previewTile.setScale(game.getTileSize() / previewTile.getLocalBounds().height, game.getTileSize() / previewTile.getLocalBounds().height);
     previewTile.setPosition(snappedX, snappedY);
     previewTile.setColor(sf::Color(255, 255, 255, 128));
@@ -246,8 +250,10 @@ void LevelCreator::render(Game& game) {
 }
 
 void LevelCreator::drawPlacedTiles(Game& game) {
-    for (const auto& tile : placedTiles) {
-        game.window.draw(tile);
+    for (const auto &tileX : placedTileSprites) {
+        for(const auto &tileY : tileX) {
+            game.window.draw(tileY);
+        }
     }
 }
 
@@ -306,23 +312,26 @@ void LevelCreator::drawInputBox(Game& game) {
 }
 
 void LevelCreator::saveWallToCSV(const std::string& filename) {
-    std::ofstream file("resources/" + filename);
+    std::ofstream file("resources/Levels/" + filename);
     if (!file.is_open()) {
         std::cerr << "Error opening file to save" << std::endl;
         return;
     }
 
-    for (size_t i = 0; i < placedTiles.size(); ++i) {
-        sf::Vector2f position = placedTiles[i].getPosition();
-        file << static_cast<int>(position.x) << "," << static_cast<int>(position.y) << "," << textureIDs[i] << std::endl;
+    file << boundaries.x << "," << boundaries.y << std::endl;
+
+    for (size_t i = 0; i < placedTileSprites.size(); ++i) {
+        for (int j = 0; j < placedTileSprites[i].size(); ++j) {
+            file << i << "," << j << "," << placedTileIDs[i][j] << std::endl;
+        }
     }
 
     file.close();
 }
 
 void LevelCreator::clearDrawing(Game& game) {
-    placedTiles.clear();
-    textureIDs.clear();
+    placedTileSprites.clear();
+    placedTileIDs.clear();
 
     game.changeState(std::make_shared<MenuState>());
 }
