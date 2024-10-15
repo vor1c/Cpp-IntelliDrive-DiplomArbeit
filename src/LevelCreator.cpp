@@ -12,6 +12,28 @@
 #include <iostream>
 #include <string>
 
+void LevelCreator::drawPolygon(Game &game, const std::vector<sf::Vector2f>& points, sf::Color Outline, sf::Color Fill) {
+    if (points.size() < 3) {
+        return;
+    }
+
+    sf::ConvexShape polygon;
+    polygon.setPointCount(points.size());
+
+    for (size_t i = 0; i < points.size(); ++i) {
+        polygon.setPoint(i, points[i]);
+    }
+
+    polygon.setFillColor(Fill);
+
+    polygon.setOutlineColor(Outline);
+    polygon.setOutlineThickness(2.0f);
+
+    // Draw the polygon
+    game.window.draw(polygon);
+}
+
+
 LevelCreator::LevelCreator(Game& game) : showExplanation(true) {
     initializeResources(game);
     createButtons(game);
@@ -123,6 +145,18 @@ void LevelCreator::handleTextInput(const sf::Event& event, Game& game) {
 void LevelCreator::handleMouseInput(const sf::Event& event, Game& game) {
     sf::Vector2f mousePos = game.window.mapPixelToCoords(sf::Mouse::getPosition(game.window));
 
+    if (event.type == sf::Event::MouseWheelScrolled) {
+        if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
+            if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
+                if (event.mouseWheelScroll.delta > 0) {
+                    selectedTile = (selectedTile + 1) % tiles.size();
+                } else if (event.mouseWheelScroll.delta < 0) {
+                    selectedTile = (selectedTile == 0) ? tiles.size() - 1 : selectedTile - 1;
+                }
+            }
+        }
+    }
+
     if (event.type == sf::Event::MouseButtonPressed) {
         if (event.mouseButton.button == sf::Mouse::Left) {
             if (saveButton.getGlobalBounds().contains(mousePos)) {
@@ -132,11 +166,17 @@ void LevelCreator::handleMouseInput(const sf::Event& event, Game& game) {
                 clearDrawing(game);
             } else {
                 mouseDown = true;
-                addTileAtMouse(game);
+                if(tileEditMode){
+
+                }else{
+                    addTileAtMouse(game);
+                }
             }
         } else if (event.mouseButton.button == sf::Mouse::Right) {
             rightMouseDown = true;
             removeTileAtMouse(game);
+        } else if (event.mouseButton.button == sf::Mouse::Middle) {
+            tileEditMode = !tileEditMode;
         }
     }
 
@@ -157,12 +197,14 @@ void LevelCreator::handleMouseInput(const sf::Event& event, Game& game) {
     }
 }
 
-
 void LevelCreator::handleKeyboardInput(const sf::Event& event, Game& game) {
     if (event.type == sf::Event::KeyPressed) {
         if (event.key.code == sf::Keyboard::S) {
             inputActive = true;
             inputFileName.clear();
+        }
+        if (event.key.code == sf::Keyboard::E){
+            tileEditMode = !tileEditMode;
         }
         if (event.key.code == sf::Keyboard::Escape) {
             game.changeState(std::make_shared<MenuState>());
@@ -173,6 +215,16 @@ void LevelCreator::handleKeyboardInput(const sf::Event& event, Game& game) {
             selectedTile = (selectedTile == 0) ? tiles.size() - 1 : selectedTile - 1;
         }
     }
+}
+
+void LevelCreator::addPointToTile(Game &game) {
+    sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
+
+    int height = game.window.getSize().y / 2;
+    int width = game.window.getSize().x / 2;
+
+
+
 }
 
 void LevelCreator::addTileAtMouse(Game& game) {
@@ -232,13 +284,17 @@ void LevelCreator::render(Game& game) {
 
     game.window.draw(backgroundSprite);
 
-    drawPlacedTiles(game);
+    if(tileEditMode){
 
-    if (!showExplanation && !inputActive) {
         game.window.draw(previewTile);
-    }
 
-    drawButtons(game);
+    }else{
+        drawPlacedTiles(game);
+
+        if (!showExplanation && !inputActive) {
+            game.window.draw(previewTile);
+        }
+    }
 
     if (showExplanation) {
         drawExplanationScreen(game);
@@ -247,6 +303,8 @@ void LevelCreator::render(Game& game) {
     if (inputActive) {
         drawInputBox(game);
     }
+
+    drawButtons(game);
 }
 
 void LevelCreator::drawPlacedTiles(Game& game) {

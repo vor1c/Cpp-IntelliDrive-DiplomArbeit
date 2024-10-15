@@ -24,6 +24,9 @@ public:
     void clearDrawing(Game& game);
 
 private:
+    void addPointToTile(Game& game);
+    void drawPolygon(Game &game, const std::vector<sf::Vector2f>& points, sf::Color Outline, sf::Color Fill);
+
     void initializeResources(Game& game);
     void createButtons(Game& game);
 
@@ -52,6 +55,8 @@ private:
     std::vector<Tile> tiles; // These are the tiles loaded by the resource manager they are used as blueprints
 
     sf::Vector2i boundaries; // How many tiles can be placed on the x -and y-axis
+
+    bool tileEditMode = false; // edit the Tile
 
     std::vector<std::vector<int>> placedTileIDs;
     std::vector<std::vector<sf::Sprite>> placedTileSprites;
