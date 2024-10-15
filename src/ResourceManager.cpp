@@ -51,26 +51,66 @@ sf::Texture& ResourceManager::getTexture(const std::string& name) {
     }
 }
 
-void ResourceManager::loadTexturesInBulk(const std::string& path, const std::string& prefix, const std::string& postfix) {
-    bulkTextures.clear(); // Clear the vector before loading new textures -- not ChatGPT (Devrim)
-    int cnt = 1;
+void ResourceManager::saveTilesToCSV(const std::string& filename) {
+    std::ofstream file(filename);
 
-    while (true) {
-        std::string tilePath = path + prefix + (cnt < 10 ? "0" : "") + std::to_string(cnt) + postfix;
-        sf::Texture texture;
-        if (!texture.loadFromFile(tilePath)) {
-            break;
-        } else {
-            bulkTextures.push_back(std::move(texture));
+    if (!file.is_open()) {
+        std::cerr << "Error opening file for saving" << std::endl;
+        return;
+    }
+
+    for (const auto& tile : tiles) {
+        file << tile.getTexturePath();
+
+        file << "," << tile.getCollisionPolygon().size();
+
+        for (const auto& point : tile.getCollisionPolygon()) {
+            file << "," << point.x << "," << point.y;
         }
-        cnt++;
+
+        file << std::endl;
     }
 
-    if (bulkTextures.empty()) {
-        std::cerr << "No textures loaded in bulk from path: " << path << std::endl;
-    }
+    file.close();
+    std::cout << "Tiles saved to " << filename << std::endl;
 }
 
-const std::vector<sf::Texture>& ResourceManager::getBulkTextures() {
-    return bulkTextures;
+void ResourceManager::loadTilesFromCSV(const std::string& filename) {
+    std::ifstream file(filename);
+
+    if (!file.is_open()) {
+        std::cerr << "Error opening file for loading" << std::endl;
+        return;
+    }
+
+    std::string line;
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string texturePath;
+        std::getline(ss, texturePath, ',');
+
+        Tile tile(texturePath);
+
+        size_t polygonSize;
+        ss >> polygonSize;
+        ss.ignore(1, ',');
+
+        for (size_t i = 0; i < polygonSize; ++i) {
+            float x, y;
+            ss >> x;
+            ss.ignore(1, ',');
+            ss >> y;
+            if (i < polygonSize - 1) {
+                ss.ignore(1, ',');
+            }
+
+            tile.addCollisionPoint(sf::Vector2f(x, y));
+        }
+
+        tiles.push_back(tile);
+    }
+
+    file.close();
+    std::cout << "Tiles loaded from " << filename << std::endl;
+    return;
 }

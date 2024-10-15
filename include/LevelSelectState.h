@@ -11,6 +11,9 @@
 #include <vector>
 #include <string>
 #include <filesystem>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 class LevelSelectState : public State {
 public:
@@ -30,7 +33,7 @@ private:
     const unsigned int levelsPerPage = 4;
 
     sf::Font font;
-    std::vector<sf::Texture> bulkTextures;
+    std::vector<Tile> tiles;
     sf::Vector2u defaultWindowSize;
     sf::Font titlefont;
     sf::Text titleText;

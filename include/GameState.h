@@ -31,8 +31,12 @@ private:
     std::vector<sf::VertexArray> rays;
     std::vector<sf::VertexArray> collisionMarkers;
     std::vector<sf::RectangleShape> walls;
-    std::vector<sf::Sprite> placedTiles;
-    std::vector<sf::Texture> tiles;
+
+    sf::Vector2i boundaries; // How many tiles can be placed on the x -and y-axis
+
+    std::vector<std::vector<int>> placedTileIDs;
+    std::vector<std::vector<sf::Sprite>> placedTileSprites;
+    std::vector<Tile> tiles;
 
     void debugDrawing(Game& game);
     void initializeCar();

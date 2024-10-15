@@ -36,11 +36,12 @@ bool getLineIntersection(sf::Vector2f p0, sf::Vector2f p1,
 GameState::GameState(Game& game, const std::string& levelFile) : car(game.getCar()) {
     initializeCar();
     initialiazeRays();
-    placedTiles.clear();
+    placedTileSprites.clear();
+    placedTileIDs.clear();
 
     ResourceManager& resourceManager = ResourceManager::getInstance();
-    resourceManager.loadTexturesInBulk("resources/Tiles/Asphalt road/", "road_asphalt", ".png");
-    tiles = resourceManager.getBulkTextures();
+    resourceManager.loadTilesFromCSV("resources/Tiles/Tiles.csv");
+    tiles = resourceManager.getTiles();
 
     loadLevelFromCSV(levelFile, game);
 }
@@ -59,33 +60,54 @@ void GameState::handleInput(Game& game) {
 }
 
 void GameState::loadLevelFromCSV(const std::string& filename, Game &game) {
+
+    std::cout << "Level loading...\n";
+
     std::ifstream file(filename);
     std::string line;
+    int idx = 0;
 
     while (std::getline(file, line)) {
         std::stringstream ss(line);
-        float x, y;
-        int texture;
         char comma;
+        int x, y;
 
-        ss >> x >> comma >> y >> comma >> texture;
+        std::cout << "idx: " << idx << "\n";
 
-        std::cout << "xxxx " << x << " " << y << " " <<texture << "\n";
+        if(idx == 0){
+            ss >> x >> comma >> y;
 
-        sf::Sprite s;
-        s.setTexture(tiles[texture]);
-        s.setScale(game.getTileSize() / s.getLocalBounds().height, game.getTileSize() / s.getLocalBounds().height);
-        s.setPosition(x, y);
-        placedTiles.emplace_back(s);
+            // read the boundaries from the file
+            boundaries = {x, y};
 
-        std::cout << "HALLO!\n";
+            // Resize the vectors so they contain the necessary number of elements
+            placedTileIDs.resize(x, std::vector<int>(y, -1));
+            placedTileSprites.resize(x, std::vector<sf::Sprite>(y));
+        }else{
+            int texture;
 
+            ss >> x >> comma >> y >> comma >> texture;
+
+            std::cout << "pos: [" << x << "/" << y << "], texture: " << texture << "\n";
+
+            if (x < 0 || x > boundaries.x || y < 0 || y > boundaries.y){
+                std::cerr << "The file seems to be corrupt!\n";
+                return; // Return because the tiles are out of bounds!
+            }
+
+            sf::Sprite s;
+            s.setTexture(tiles[texture].getTexture());
+            s.setScale(game.getTileSize() / s.getLocalBounds().height, game.getTileSize() / s.getLocalBounds().height);
+            s.setPosition(game.getTileSize() * x, game.getTileSize() * y);
+
+            placedTileSprites[x][y] = s;
+            placedTileIDs[x][y] = texture;
+        }
+        idx++;
     }
-
 }
 
 void GameState::initialiazeRays() {
-    //haha init (alles is pfusch hier)
     rayDistances.resize(5, 0.0f);
     rays.resize(5);
     collisionMarkers.reserve(5);
@@ -124,7 +146,7 @@ void GameState::performRaycasts(Game& game) {
 
         for (const auto& wall : walls) {
             sf::FloatRect wallBounds = wall.getGlobalBounds();
-            //wenn ich ehrlich bin idk wie der kakc funktioniert
+
             sf::Vector2f p1(wallBounds.left, wallBounds.top);
             sf::Vector2f p2(wallBounds.left + wallBounds.width, wallBounds.top);
             sf::Vector2f p3(wallBounds.left + wallBounds.width, wallBounds.top + wallBounds.height);
@@ -151,7 +173,7 @@ void GameState::performRaycasts(Game& game) {
         }
 
         rayDistances[i] = minDistance;
-        //haha HUbersohn
+
         sf::VertexArray ray(sf::Lines, 2);
         ray[0].position = carPosition;
         ray[0].color = sf::Color(0, 255, 0, 255);;
@@ -235,13 +257,15 @@ void GameState::debugDrawing(Game& game) {
         game.window.draw(wall);
     }
 }
-//wenn du das liest bist du ein hurensohn
 
 void GameState::render(Game& game) {
     game.window.clear();
-    for (int i = 1; i < placedTiles.size(); ++i) {
-        game.window.draw(placedTiles[i]);
+    for (const auto &tileX : placedTileSprites) {
+        for(const auto &tileY : tileX) {
+            game.window.draw(tileY);
+        }
     }
+
     car.render(game.window);
 
     for (const auto& ray : rays) {
