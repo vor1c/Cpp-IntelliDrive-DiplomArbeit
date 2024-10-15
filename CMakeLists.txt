@@ -60,7 +60,7 @@ endforeach()
 if (WIN32)
     # Define the path to the SFML and MinGW (GCC) DLLs
     set(SFML_DLLS_DIR ${PROJECT_SOURCE_DIR}/vendors/bin)
-    set(GCC_DLLS_DIR "C:/Program Files/JetBrains/CLion 2024.2.1/bin/mingw/bin")
+    set(GCC_DLLS_DIR ${PROJECT_SOURCE_DIR}/vendors/bin2)
 
     # List of required DLLs
     set(SFML_DLLS
