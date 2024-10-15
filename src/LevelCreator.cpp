@@ -12,33 +12,12 @@
 #include <iostream>
 #include <string>
 
-void LevelCreator::drawPolygon(Game &game, const std::vector<sf::Vector2f>& points, sf::Color Outline, sf::Color Fill) {
-    if (points.size() < 3) {
-        return;
-    }
-
-    sf::ConvexShape polygon;
-    polygon.setPointCount(points.size());
-
-    for (size_t i = 0; i < points.size(); ++i) {
-        polygon.setPoint(i, points[i]);
-    }
-
-    polygon.setFillColor(Fill);
-
-    polygon.setOutlineColor(Outline);
-    polygon.setOutlineThickness(2.0f);
-
-    // Draw the polygon
-    game.window.draw(polygon);
-}
-
 
 LevelCreator::LevelCreator(Game& game) : showExplanation(true) {
     initializeResources(game);
     createButtons(game);
 
-    boundaries = {static_cast<int>(game.window.getSize().x / game.getTileSize()), static_cast<int>(game.window.getSize().y / game.getTileSize())};
+    boundaries = {static_cast<int>(game.window.getSize().x / game.getTileSize()), static_cast<int>(game.window.getSize().y / game.getTileSize()) + 1};
 
     // Resize the vectors so they contain the necessary number of elements
     placedTileIDs.resize(boundaries.x, std::vector<int>(boundaries.y, -1));
@@ -286,6 +265,13 @@ void LevelCreator::render(Game& game) {
 
     if(tileEditMode){
 
+        std::vector<sf::Vector2f> points = tiles[selectedTile].getCollisionPolygon();
+
+        sf::Sprite s;
+        //s.setScale(game.getTileSize() / s.get)
+
+        drawPolygon(game, tiles[selectedTile].getCollisionPolygon(), sf::Color(100, 100, 100, 100), sf::Color(50, 0, 200));
+
         game.window.draw(previewTile);
 
     }else{
@@ -392,4 +378,25 @@ void LevelCreator::clearDrawing(Game& game) {
     placedTileIDs.clear();
 
     game.changeState(std::make_shared<MenuState>());
+}
+
+void LevelCreator::drawPolygon(Game &game, const std::vector<sf::Vector2f>& points, sf::Color Outline, sf::Color Fill) {
+    if (points.size() < 3) {
+        return;
+    }
+
+    sf::ConvexShape polygon;
+    polygon.setPointCount(points.size());
+
+    for (size_t i = 0; i < points.size(); ++i) {
+        polygon.setPoint(i, points[i]);
+    }
+
+    polygon.setFillColor(Fill);
+
+    polygon.setOutlineColor(Outline);
+    polygon.setOutlineThickness(2.0f);
+
+    // Draw the polygon
+    game.window.draw(polygon);
 }
