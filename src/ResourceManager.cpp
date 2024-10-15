@@ -22,7 +22,18 @@ sf::Font& ResourceManager::getFont(const std::string& name) {
     return fonts.at(name);
 }
 
-void ResourceManager::loadTexture(const std::string& name, const std::string& filename) {
+bool ResourceManager::loadTexture(const std::string &name, const std::string &filename) {
+    sf::Texture texture;
+    if (texture.loadFromFile(filename)) {
+        textures[name] = std::move(texture);
+        return true;
+    } else {
+        std::cerr << "Error loading texture: " << filename << std::endl;
+        return false;
+    }
+}
+
+void ResourceManager::setTexture(const std::string& name, const std::string& filename) {
     sf::Texture texture;
     if (texture.loadFromFile(filename)) {
         textures[name] = std::move(texture);
@@ -32,7 +43,12 @@ void ResourceManager::loadTexture(const std::string& name, const std::string& fi
 }
 
 sf::Texture& ResourceManager::getTexture(const std::string& name) {
-    return textures.at(name);
+    auto it = textures.find(name);
+    if (it != textures.end()) {
+        return it->second;
+    } else {
+        throw std::runtime_error("Texture not found: " + name);
+    }
 }
 
 void ResourceManager::loadTexturesInBulk(const std::string& path, const std::string& prefix, const std::string& postfix) {

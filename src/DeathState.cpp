@@ -3,6 +3,8 @@
 //
 
 #include "../include/DeathState.h"
+
+#include "LevelSelectState.h"
 #include "../include/GameState.h"
 #include "../include/MenuState.h"
 #include "../include/ResourceManager.h"
@@ -26,7 +28,7 @@ void DeathState::handleInput(Game& game) {
             game.window.close();
         }
         if (isRestartKeyPressed(event)) {
-            game.changeState(std::make_shared<GameState>(game));
+            game.changeState(std::make_shared<LevelSelectState>());
         }
         if (isMenuKeyPressed(event)) {
             game.changeState(std::make_shared<MenuState>());
