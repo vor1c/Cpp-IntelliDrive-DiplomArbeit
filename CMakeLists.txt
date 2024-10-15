@@ -28,15 +28,19 @@ add_executable(${PROJECT_NAME} ${ALL_SOURCE_FILES} ${ALL_HEADER_FILES}
 # Use C++17 standards
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
-# Include directories
+# Include directories for SFML and Box2D
 target_include_directories(
         ${PROJECT_NAME}
         PRIVATE ${PROJECT_SOURCE_DIR}/include/
         PRIVATE ${PROJECT_SOURCE_DIR}/vendors/sfml/include/
+        PRIVATE ${PROJECT_SOURCE_DIR}/vendors/box2d/include/  # Include Box2D headers
 )
 
 # Link SFML libraries
 target_link_libraries(${PROJECT_NAME} sfml-graphics sfml-window sfml-system)
+
+# Link Box2D static library
+target_link_libraries(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/vendors/bin3/libbox2d.a)
 
 # Define the resource directory
 set(RESOURCE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources)
@@ -91,3 +95,9 @@ if (WIN32)
         )
     endforeach()
 endif()
+
+# Copy the Box2D static library (.a) to the output directory
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/vendors/bin3/libbox2d.a ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+        COMMENT "Copying Box2D static library to output directory"
+)
