@@ -19,7 +19,6 @@ file(GLOB ALL_HEADER_FILES include/*.hpp)
 add_executable(${PROJECT_NAME} ${ALL_SOURCE_FILES} ${ALL_HEADER_FILES}
         src/CarChooseState.cpp
         include/CarChooseState.h
-        include/CarChooseState.h
         src/LevelCreator.cpp
         include/LevelCreator.h
         src/LevelSelectState.cpp
@@ -48,9 +47,6 @@ file(MAKE_DIRECTORY ${RESOURCE_DIR})
 # Get all files in the resources directory
 file(GLOB RESOURCE_FILES ${PROJECT_SOURCE_DIR}/resources/*)
 
-# Link DLLs
-target_link_libraries(IntelliDrive -static)
-
 # Add custom command to copy resource files
 foreach(resource ${RESOURCE_FILES})
     get_filename_component(resource_name ${resource} NAME)
@@ -59,3 +55,39 @@ foreach(resource ${RESOURCE_FILES})
             COMMENT "Copying ${resource} to ${RESOURCE_DIR}/${resource_name}"
     )
 endforeach()
+
+# Copy necessary DLLs after the build
+if (WIN32)
+    # Define the path to the SFML and MinGW (GCC) DLLs
+    set(SFML_DLLS_DIR ${PROJECT_SOURCE_DIR}/vendors/sfml/bin)
+    set(GCC_DLLS_DIR "C:/Program Files/JetBrains/CLion 2024.2.1/bin/mingw/bin")
+
+    # List of required DLLs
+    set(SFML_DLLS
+            ${SFML_DLLS_DIR}/sfml-graphics-2.dll
+            ${SFML_DLLS_DIR}/sfml-window-2.dll
+            ${SFML_DLLS_DIR}/sfml-system-2.dll
+    )
+
+    set(GCC_DLLS
+            ${GCC_DLLS_DIR}/libgcc_s_seh-1.dll
+            ${GCC_DLLS_DIR}/libstdc++-6.dll
+            ${GCC_DLLS_DIR}/libwinpthread-1.dll
+    )
+
+    # Add custom command to copy SFML DLLs
+    foreach(dll ${SFML_DLLS})
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different ${dll} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+                COMMENT "Copying SFML DLL ${dll} to output directory"
+        )
+    endforeach()
+
+    # Add custom command to copy GCC DLLs
+    foreach(dll ${GCC_DLLS})
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different ${dll} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+                COMMENT "Copying GCC DLL ${dll} to output directory"
+        )
+    endforeach()
+endif()
