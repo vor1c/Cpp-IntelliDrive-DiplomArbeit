@@ -6,9 +6,11 @@
 #include "../include/MenuState.h"
 #include "../include/ResourceManager.h"
 
-Game::Game() : window(sf::VideoMode(1920, 1080), "IntelliDrive", sf::Style::Fullscreen)
+Game::Game()
+    : window(sf::VideoMode(1920, 1080), "IntelliDrive", sf::Style::Fullscreen),
+      world(b2Vec2(0.0f, 0.0f)),
+      car(world, sf::Vector2f(100.0f, 100.0f))
 {
-    car = {};
     loadCarData("resources/cars.csv");
     car.applyData(cars[0]);
     pushState(std::make_shared<MenuState>());
@@ -40,6 +42,10 @@ void Game::run() {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)){
             window.setFramerateLimit(10000);
         }
+
+        int32 velocityIterations = 8;
+        int32 positionIterations = 3;
+        world.Step(dt, velocityIterations, positionIterations);
 
         if (auto currentState = getCurrentState()) {
             currentState->handleInput(*this);

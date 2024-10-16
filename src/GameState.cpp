@@ -20,7 +20,6 @@ bool getLineIntersection(sf::Vector2f p0, sf::Vector2f p1,
 
     if (fabs(denominator) < 1e-6)
         return false;
-    //wenn das ned geht tot
     s = (-s1.y * (p0.x - p2.x) + s1.x * (p0.y - p2.y)) / denominator;
     t = ( s2.x * (p0.y - p2.y) - s2.y * (p0.x - p2.x)) / denominator;
 
@@ -79,7 +78,6 @@ void GameState::loadLevelFromCSV(const std::string& filename, Game &game) {
             // read the boundaries from the file
             boundaries = {x, y};
 
-            // Resize the vectors so they contain the necessary number of elements
             placedTileIDs.resize(x, std::vector<int>(y, -1));
             placedTileSprites.resize(x, std::vector<sf::Sprite>(y));
         }else{

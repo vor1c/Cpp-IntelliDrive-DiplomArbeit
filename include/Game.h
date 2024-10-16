@@ -10,6 +10,7 @@
 #include <iostream>
 #include <numeric>
 #include <sstream>
+#include <box2d/box2d.h>
 #include <chrono>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
@@ -37,6 +38,7 @@ public:
     sf::RenderWindow window;
     float dt;
     std::vector<carData> cars;
+    b2World world;
 
     float getTileSize() {return this->tileSize;}
 

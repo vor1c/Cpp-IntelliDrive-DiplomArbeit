@@ -6,6 +6,7 @@
 #define CAR_H
 
 #include <SFML/Graphics.hpp>
+#include <Box2D/Box2D.h>
 #include "SFML/Window/Keyboard.hpp"
 
 struct carData {
@@ -23,7 +24,8 @@ struct carData {
 
 class Car {
 public:
-    Car();
+    Car(b2World& world, const sf::Vector2f& position);
+    ~Car();
     void resetVelocity();
     void resetAngularAcceleration();
     void handleInput();
@@ -37,24 +39,27 @@ public:
     sf::Sprite& getCarSprite();
     void setPreviousPosition(const sf::Vector2f& position);
     void setCurrentPosition(const sf::Vector2f& position);
-    
-    sf::Vector2f velocity;
+
 private:
     sf::Sprite carSprite;
     sf::Vector2f current_position;
     sf::Vector2f previous_position;
-    float rotation_angle;
-    float angular_velocity;
-    float acceleration;
-    float angular_acceleration;
-    float acceleration_constant;
-    float angular_acceleration_constant;
-    float max_speed;
-    float angular_damping;
-    float friction_coefficient;
+
+    // Box2D body
+    b2Body* body;
+
+    // Car properties
     float maxSpeedValue;
     float handlingValue;
     float accelerationValue;
+
+    // Input states
+    float desiredSpeed;
+    float desiredSteeringAngle;
+
+    // Constants
+    static constexpr float DEGTORAD = 0.0174532925199432957f;
+    static constexpr float RADTODEG = 57.295779513082320876f;
 };
 
 #endif // CAR_H

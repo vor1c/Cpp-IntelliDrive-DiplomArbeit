@@ -6,97 +6,92 @@
 #include <iostream>
 #include <cmath>
 
-constexpr float PI = 3.14159265f;
-
-constexpr float MAX_ACCELERATION_CONSTANT = 1000.0f; // Units: pixels per second squared
-constexpr float MAX_ANGULAR_ACCELERATION_CONSTANT = 200.0f; // Units: degrees per second squared
 constexpr float MAX_SPEED = 900.0f; // Units: pixels per second
+constexpr float MAX_ACCELERATION = 1000.0f; // Units: pixels per second squared
+constexpr float MAX_STEERING_ANGLE = 30.0f; // Degrees
 
-Car::Car()
-    : current_position(0.0f, 0.0f),
-      previous_position(0.0f, 0.0f),
-      velocity(0.0f, 0.0f),
-      rotation_angle(0.0f),
-      angular_velocity(0.0f),
-      acceleration(0.0f),
-      angular_acceleration(0.0f),
-      angular_damping(0.1f),
-      friction_coefficient(0.30f), // Adjust between 0 (no friction) and 1 (full stop instantly)
-      acceleration_constant(10.1f),
-      angular_acceleration_constant(0.1f),
-      max_speed(10.0f),
+Car::Car(b2World& world, const sf::Vector2f& position)
+    : current_position(position),
+      previous_position(position),
       maxSpeedValue(5.0f),
       handlingValue(5.0f),
-      accelerationValue(5.0f)
+      accelerationValue(5.0f),
+      desiredSpeed(0.0f),
+      desiredSteeringAngle(0.0f)
 {
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_dynamicBody;
+    bodyDef.position.Set(position.x, position.y);
+    bodyDef.angle = 0.0f;
+    body = world.CreateBody(&bodyDef);
+
+    b2PolygonShape carShape;
+    sf::FloatRect spriteBounds = carSprite.getLocalBounds();
+    carShape.SetAsBox(spriteBounds.width / 2.0f, spriteBounds.height / 2.0f);
+
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &carShape;
+    fixtureDef.density = 1.0f;
+    fixtureDef.friction = 0.3f;
+
+    body->CreateFixture(&fixtureDef);
+}
+
+Car::~Car() {
+    if (body) {
+        body->GetWorld()->DestroyBody(body);
+        body = nullptr;
+    }
 }
 
 void Car::handleInput() {
+    desiredSpeed = 0.0f;
+    desiredSteeringAngle = 0.0f;
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        acceleration = acceleration_constant;
+        desiredSpeed = accelerationValue * (MAX_SPEED / 10.0f);
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        acceleration = -acceleration_constant;
-    } else {
-        acceleration = 0.0f;
+        desiredSpeed = -accelerationValue * (MAX_SPEED / 10.0f);
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-        angular_acceleration = -angular_acceleration_constant;
+        desiredSteeringAngle = handlingValue * (MAX_STEERING_ANGLE / 10.0f);
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-        angular_acceleration = angular_acceleration_constant;
-    } else {
-        angular_acceleration = 0.0f;
+        desiredSteeringAngle = -handlingValue * (MAX_STEERING_ANGLE / 10.0f);
     }
 }
 
 void Car::resetVelocity() {
-    velocity.x = 0.0f;
-    velocity.y = 0.0f;
+    body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
 }
 
 void Car::resetAngularAcceleration() {
-    angular_acceleration = 0.0f;
-    acceleration = 0.0f;
-    angular_velocity = 0.0f;
-    angular_damping = 0.0f;
+    body->SetAngularVelocity(0.0f);
 }
 
 void Car::update(float dt) {
-    float radian_angle = rotation_angle * (PI / 180.0f);
+    // Get the current forward direction
+    b2Vec2 currentForwardNormal = body->GetWorldVector(b2Vec2(0.0f, -1.0f));
 
-    sf::Vector2f forward_direction(sinf(radian_angle), -cosf(radian_angle));
+    // Apply acceleration
+    float acceleration = desiredSpeed - b2Dot(body->GetLinearVelocity(), currentForwardNormal);
+    acceleration = std::clamp(acceleration, -MAX_ACCELERATION * dt, MAX_ACCELERATION * dt);
+    b2Vec2 force = acceleration * currentForwardNormal;
+    body->ApplyForceToCenter(force, true);
 
-    velocity += forward_direction * acceleration * dt;
+    // Apply steering
+    float currentAngle = body->GetAngle();
+    float angleDifference = (desiredSteeringAngle * DEGTORAD) - currentAngle;
+    angleDifference = std::clamp(angleDifference, -handlingValue * dt, handlingValue * dt);
+    body->SetAngularVelocity(angleDifference / dt);
 
-    velocity -= velocity * friction_coefficient * dt;
-
-    float speed = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
-    if (speed > max_speed) {
-        velocity = (velocity / speed) * max_speed;
-    }
-
-    current_position += velocity * dt;
-
-    angular_velocity += angular_acceleration * dt;
-
-    angular_velocity -= angular_velocity * angular_damping * dt;
-
-    rotation_angle += angular_velocity * dt;
-
-    if (rotation_angle >= 360.0f) {
-        rotation_angle -= 360.0f;
-    } else if (rotation_angle < 0.0f) {
-        rotation_angle += 360.0f;
-    }
-
+    // Update sprite position and rotation
+    current_position.x = body->GetPosition().x;
+    current_position.y = body->GetPosition().y;
     carSprite.setPosition(current_position);
-    carSprite.setRotation(rotation_angle);
+    carSprite.setRotation(body->GetAngle() * RADTODEG);
 
     previous_position = current_position;
-}
-
-void Car::resetRotationAngle() {
-    rotation_angle = 0.0f;
 }
 
 void Car::render(sf::RenderWindow& window) {
@@ -108,20 +103,24 @@ sf::FloatRect Car::getBounds() const {
 }
 
 void Car::applyData(carData &data) {
-    carSprite = {};
     carSprite.setTexture(data.carTexture);
 
     maxSpeedValue = static_cast<float>(data.MaxSpeed);
     handlingValue = static_cast<float>(data.Handling);
     accelerationValue = static_cast<float>(data.Acceleration);
 
-    acceleration_constant = accelerationValue * (MAX_ACCELERATION_CONSTANT / 10.0f);
-    angular_acceleration_constant = handlingValue * (MAX_ANGULAR_ACCELERATION_CONSTANT / 10.0f);
-    max_speed = maxSpeedValue * (MAX_SPEED / 10.0f);
+    // Update physical properties if necessary
+    b2Fixture* fixture = body->GetFixtureList();
+    while (fixture) {
+        fixture->SetDensity(data.weight);
+        fixture->SetFriction(0.3f); // Adjust based on car properties
+        fixture = fixture->GetNext();
+    }
+    body->ResetMassData();
 }
 
 float Car::getRotationAngle() const {
-    return rotation_angle;
+    return body->GetAngle() * RADTODEG;
 }
 
 sf::Vector2f Car::getCurrentPosition() const {
@@ -134,8 +133,13 @@ void Car::setPreviousPosition(const sf::Vector2f& position) {
 
 void Car::setCurrentPosition(const sf::Vector2f& position) {
     current_position = position;
+    body->SetTransform(b2Vec2(position.x, position.y), body->GetAngle());
 }
 
 sf::Sprite& Car::getCarSprite() {
     return carSprite;
+}
+
+void Car::resetRotationAngle() {
+    body->SetTransform(body->GetPosition(), 0.0f);
 }
