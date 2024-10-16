@@ -89,7 +89,7 @@ void GameState::loadLevelFromCSV(const std::string& filename, Game &game) {
 
             std::cout << "pos: [" << x << "/" << y << "], texture: " << texture << "\n";
 
-            if (x < 0 || x > boundaries.x || y < 0 || y > boundaries.y){
+            if (x < 0 || x >= boundaries.x || y < 0 || y >= boundaries.y){
                 std::cerr << "The file seems to be corrupt!\n";
                 return; // Return because the tiles are out of bounds!
             }
