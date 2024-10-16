@@ -10,36 +10,23 @@ constexpr float MAX_SPEED = 900.0f; // Units: pixels per second
 constexpr float MAX_ACCELERATION = 1000.0f; // Units: pixels per second squared
 constexpr float MAX_STEERING_ANGLE = 30.0f; // Degrees
 
-Car::Car(b2World& world, const sf::Vector2f& position)
-    : current_position(position),
-      previous_position(position),
+Car::Car(b2World& world)
+    : m_world(world),
+      body(nullptr),
+      current_position(0.0f, 0.0f),
+      previous_position(0.0f, 0.0f),
       maxSpeedValue(5.0f),
       handlingValue(5.0f),
       accelerationValue(5.0f),
       desiredSpeed(0.0f),
       desiredSteeringAngle(0.0f)
 {
-    b2BodyDef bodyDef;
-    bodyDef.type = b2_dynamicBody;
-    bodyDef.position.Set(position.x, position.y);
-    bodyDef.angle = 0.0f;
-    body = world.CreateBody(&bodyDef);
 
-    b2PolygonShape carShape;
-    sf::FloatRect spriteBounds = carSprite.getLocalBounds();
-    carShape.SetAsBox(spriteBounds.width / 2.0f, spriteBounds.height / 2.0f);
-
-    b2FixtureDef fixtureDef;
-    fixtureDef.shape = &carShape;
-    fixtureDef.density = 1.0f;
-    fixtureDef.friction = 0.3f;
-
-    body->CreateFixture(&fixtureDef);
 }
 
 Car::~Car() {
     if (body) {
-        body->GetWorld()->DestroyBody(body);
+        m_world.DestroyBody(body);
         body = nullptr;
     }
 }
@@ -109,14 +96,39 @@ void Car::applyData(carData &data) {
     handlingValue = static_cast<float>(data.Handling);
     accelerationValue = static_cast<float>(data.Acceleration);
 
-    // Update physical properties if necessary
-    b2Fixture* fixture = body->GetFixtureList();
-    while (fixture) {
-        fixture->SetDensity(data.weight);
-        fixture->SetFriction(0.3f); // Adjust based on car properties
-        fixture = fixture->GetNext();
+    // Ensure the texture has valid dimensions
+    sf::FloatRect spriteBounds = carSprite.getLocalBounds();
+    if (spriteBounds.width == 0 || spriteBounds.height == 0) {
+        std::cerr << "Error: Car sprite has zero dimensions." << std::endl;
+        return;
     }
-    body->ResetMassData();
+
+    // Create Box2D body
+    if (body != nullptr) {
+        m_world.DestroyBody(body);
+        body = nullptr;
+    }
+
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_dynamicBody;
+    bodyDef.position.Set(current_position.x / SCALE, current_position.y / SCALE);
+    bodyDef.angle = 0.0f;
+    body = m_world.CreateBody(&bodyDef);
+
+    // Define the shape of the car (rectangle)
+    b2PolygonShape carShape;
+    carShape.SetAsBox(
+        (spriteBounds.width / 2.0f) / SCALE,
+        (spriteBounds.height / 2.0f) / SCALE
+    );
+
+    // Define the fixture
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &carShape;
+    fixtureDef.density = data.weight;
+    fixtureDef.friction = 0.3f; // Adjust based on car properties
+
+    body->CreateFixture(&fixtureDef);
 }
 
 float Car::getRotationAngle() const {

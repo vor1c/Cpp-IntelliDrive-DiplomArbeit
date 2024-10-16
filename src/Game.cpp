@@ -9,7 +9,7 @@
 Game::Game()
     : window(sf::VideoMode(1920, 1080), "IntelliDrive", sf::Style::Fullscreen),
       world(b2Vec2(0.0f, 0.0f)),
-      car(world, sf::Vector2f(100.0f, 100.0f))
+      car(world)
 {
     loadCarData("resources/cars.csv");
     car.applyData(cars[0]);

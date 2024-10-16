@@ -24,7 +24,7 @@ struct carData {
 
 class Car {
 public:
-    Car(b2World& world, const sf::Vector2f& position);
+    Car(b2World& world);
     ~Car();
     void resetVelocity();
     void resetAngularAcceleration();
@@ -46,6 +46,7 @@ private:
     sf::Vector2f previous_position;
 
     // Box2D body
+    b2World& m_world;
     b2Body* body;
 
     // Car properties
@@ -60,6 +61,7 @@ private:
     // Constants
     static constexpr float DEGTORAD = 0.0174532925199432957f;
     static constexpr float RADTODEG = 57.295779513082320876f;
+    static constexpr float SCALE = 30.0f; // Pixels per meter
 };
 
 #endif // CAR_H
