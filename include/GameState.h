@@ -9,6 +9,7 @@
 #include "../include/Car.h"
 #include "../include/Game.h"
 #include "../include/ResourceManager.h"
+#include <cmath>
 
 class GameState : public State {
 public:

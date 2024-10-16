@@ -145,15 +145,9 @@ void LevelCreator::handleMouseInput(const sf::Event& event, Game& game) {
                 clearDrawing(game);
             } else {
                 mouseDown = true;
-                if(tileEditMode){
-
-                }else{
-                    addTileAtMouse(game);
-                }
             }
         } else if (event.mouseButton.button == sf::Mouse::Right) {
             rightMouseDown = true;
-            removeTileAtMouse(game);
         } else if (event.mouseButton.button == sf::Mouse::Middle) {
             tileEditMode = !tileEditMode;
         }
@@ -168,11 +162,19 @@ void LevelCreator::handleMouseInput(const sf::Event& event, Game& game) {
     }
 
     if (mouseDown) {
-        addTileAtMouse(game);
+        if(tileEditMode){
+            addPointToTile(game);
+        }else{
+            addTileAtMouse(game);
+        }
     }
 
     if (rightMouseDown) {
-        removeTileAtMouse(game);
+        if(tileEditMode){
+            removePointfromTile(game);
+        }else{
+            removeTileAtMouse(game);
+        }
     }
 }
 
@@ -184,6 +186,9 @@ void LevelCreator::handleKeyboardInput(const sf::Event& event, Game& game) {
         }
         if (event.key.code == sf::Keyboard::E){
             tileEditMode = !tileEditMode;
+        }
+        if (event.key.code == sf::Keyboard::C && tileEditMode){
+            tiles[selectedTile].deletePolygon();
         }
         if (event.key.code == sf::Keyboard::Escape) {
             game.changeState(std::make_shared<MenuState>());
@@ -197,13 +202,32 @@ void LevelCreator::handleKeyboardInput(const sf::Event& event, Game& game) {
 }
 
 void LevelCreator::addPointToTile(Game &game) {
-    sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
+    sf::Vector2i mousePos = sf::Mouse::getPosition();
+    sf::Vector2f transformedPoint = {(mousePos.x - game.window.getSize().x / 2.0f) / tileEditScale + game.getTileSize() / 2, (mousePos.y - game.window.getSize().y / 2.0f) / tileEditScale + game.getTileSize() / 2};
 
-    int height = game.window.getSize().y / 2;
-    int width = game.window.getSize().x / 2;
+    std::cout << "pos: [" << transformedPoint.x << "/" << transformedPoint.y << "]\n";
 
+    if(transformedPoint.x >= 0 && transformedPoint.y >= 0 && transformedPoint.x <= game.getTileSize() && transformedPoint.y <= game.getTileSize()){
+        tiles[selectedTile].addCollisionPoint(transformedPoint);
+    }
+}
 
+void LevelCreator::removePointfromTile(Game& game){
+    auto &polygon = tiles[selectedTile].getCollisionPolygon();
+    sf::Vector2i mousePos = sf::Mouse::getPosition();
+    sf::Vector2f transformedPoint = {(mousePos.x - game.window.getSize().x / 2.0f) / tileEditScale + game.getTileSize() / 2, (mousePos.y - game.window.getSize().y / 2.0f) / tileEditScale + game.getTileSize() / 2};
+    for (int i = 0; i < polygon.size(); ++i) {
+        sf::Vector2f dist = polygon[i] - transformedPoint;
 
+        float distance = sqrtf(dist.x * dist.x + dist.y * dist.y);
+        float const removeCircle = 0.1f;
+
+        std::cout << "Distance: " << distance << "\n";
+
+        if(distance < game.getTileSize() * removeCircle){
+            tiles[selectedTile].removeCollisionPoint(i);
+        }
+    }
 }
 
 void LevelCreator::addTileAtMouse(Game& game) {
@@ -264,17 +288,24 @@ void LevelCreator::render(Game& game) {
     game.window.draw(backgroundSprite);
 
     if(tileEditMode){
-
         std::vector<sf::Vector2f> points = tiles[selectedTile].getCollisionPolygon();
 
+        for (int i = 0; i < points.size(); i++) {
+            sf::Vector2f transformedPoint = {((points[i].x - game.getTileSize() / 2) * tileEditScale + game.window.getSize().x / 2.0f), ((points[i].y - game.getTileSize() / 2) * tileEditScale + game.window.getSize().y / 2.0f)};
+            points[i] = transformedPoint;
+        }
+
         sf::Sprite s;
-        //s.setScale(game.getTileSize() / s.get)
+        s.setTexture(tiles[selectedTile].getTexture());
+        s.setScale(game.getTileSize() / s.getLocalBounds().width * tileEditScale, game.getTileSize() / s.getLocalBounds().height * tileEditScale);
+        s.setPosition(game.window.getSize().x / 2 - s.getLocalBounds().width * tileEditScale / 4, game.window.getSize().y / 2 - s.getLocalBounds().height * tileEditScale / 4);
 
-        drawPolygon(game, tiles[selectedTile].getCollisionPolygon(), sf::Color(100, 100, 100, 100), sf::Color(50, 0, 200));
+        game.window.draw(s);
 
-        game.window.draw(previewTile);
+        drawPolygon(game, points, sf::Color(100, 100, 100, 100), sf::Color(50, 0, 200));
 
     }else{
+
         drawPlacedTiles(game);
 
         if (!showExplanation && !inputActive) {
