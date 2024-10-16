@@ -11,6 +11,7 @@
 #include <vector>
 #include <fstream>
 #include <SFML/Graphics.hpp>
+#include <cmath>
 
 class LevelCreator : public State {
 public:
@@ -25,6 +26,7 @@ public:
 
 private:
     void addPointToTile(Game& game);
+    void removePointfromTile(Game& game);
     void drawPolygon(Game &game, const std::vector<sf::Vector2f>& points, sf::Color Outline, sf::Color Fill);
 
     void initializeResources(Game& game);
@@ -65,6 +67,7 @@ private:
 
     int selectedTile = 0;
     bool mouseDown = false;
+    float tileEditScale = 4.0f;
 
     sf::Sprite previewTile;
     bool showExplanation = true;

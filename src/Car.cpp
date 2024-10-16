@@ -21,7 +21,6 @@ Car::Car()
       acceleration(0.0f),
       angular_acceleration(0.0f),
       angular_damping(0.1f),
-      friction(0.01f),
       friction_coefficient(0.30f), // Adjust between 0 (no friction) and 1 (full stop instantly)
       acceleration_constant(10.1f),
       angular_acceleration_constant(0.1f),

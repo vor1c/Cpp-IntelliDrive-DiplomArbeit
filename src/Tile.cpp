@@ -21,3 +21,13 @@ void Tile::setTexturePath(const std::string &path) {
         std::cerr << "Error loading texture from " << path << std::endl;
     }
 }
+
+void Tile::removeCollisionPoint(const int idx) {
+    if(idx > 0 && idx < collisionPolygon.size()){
+        collisionPolygon.erase(collisionPolygon.begin() + idx);
+    }
+}
+
+void Tile::deletePolygon() {
+    collisionPolygon.clear();
+}

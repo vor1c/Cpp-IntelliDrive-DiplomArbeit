@@ -8,11 +8,10 @@
 #include "../include/Car.h"
 #include "../include/Game.h"
 
-#define M_PI 3.141592653589793238462643383279502884197169399375105820974944 // würd es genauer machen aber mir war langweilg
-
+#define M_PI 3.141592653589793238462643383279502884197169399375105820974944
 bool getLineIntersection(sf::Vector2f p0, sf::Vector2f p1,
                          sf::Vector2f p2, sf::Vector2f p3,
-                         sf::Vector2f& intersectionPoint) { //wenn du das verstehen willst -> vergiss es ned mal chatgpt weiß wos des is
+                         sf::Vector2f& intersectionPoint) {
     sf::Vector2f s1 = p1 - p0;
     sf::Vector2f s2 = p3 - p2;
 
@@ -25,7 +24,7 @@ bool getLineIntersection(sf::Vector2f p0, sf::Vector2f p1,
     s = (-s1.y * (p0.x - p2.x) + s1.x * (p0.y - p2.y)) / denominator;
     t = ( s2.x * (p0.y - p2.y) - s2.y * (p0.x - p2.x)) / denominator;
 
-    if (s >= 0 && s <= 1 && t >= 0 && t <= 1) { // https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect <--- das is alles kopiert aber egal
+    if (s >= 0 && s <= 1 && t >= 0 && t <= 1) { // https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
         intersectionPoint = p0 + (t * s1);
         return true;
     }

@@ -26,6 +26,8 @@ public:
     void setTexturePath(const std::string& path);
 
     void addCollisionPoint(const sf::Vector2f& point);
+    void removeCollisionPoint(const int idx);
+    void deletePolygon();
 
 };
 
